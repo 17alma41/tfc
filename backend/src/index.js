@@ -1,9 +1,14 @@
+const express = require('express');
 const authMiddleware = require('./middlewares/authMiddleware.js');
 const roleMiddleware = require('./middlewares/roleMiddleware.js');
-const express = require('express');
+const { login } = require('./controllers/authController.js');
 
 const app = express();
 const port = 3000;
+
+app.use(express.json()); // Middleware para parsear JSON
+
+app.post('/login', login); // Prueba para obtener el token
 
 app.use(authMiddleware);
 
