@@ -1,25 +1,35 @@
 const express = require('express');
-const authMiddleware = require('./middlewares/authMiddleware.js');
-const roleMiddleware = require('./middlewares/roleMiddleware.js');
-const { login } = require('./controllers/authController.js');
+const cors = require('cors');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const authRoutes = require('./routes/authRoutes');
+const authMiddleware = require('./middlewares/authMiddleware');
+const roleMiddleware = require('./middlewares/roleMiddleware');
+
+require('dotenv').config({ path: './backend/src/.env' });
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json()); // Middleware para parsear JSON
+// Habilitar CORS para permitir cookies desde el frontend
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 
-app.post('/login', login); // Prueba para obtener el token
+app.use(express.json());
+app.use(cookieParser());
 
-app.use(authMiddleware);
+// Servir archivos estáticos desde la carpeta "public" (ubicada en raíz del proyecto)
+// app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
+// Ruta explícita para servir index.html desde public al acceder a "/"
 app.get('/', (req, res) => {
-    res.send('Hola!');
+    res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
 });
 
-app.get('/private', roleMiddleware('admin'), (req, res) => {
-    res.send('Privado para administradores');
-});
+app.use('/auth', authRoutes);
 
-app.listen(port, () => {
-    console.log(`Servidor iniciado en http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

@@ -1,28 +1,68 @@
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config({ path: './backend/src/.env' });
 
-// Simulación de usuarios en la base de datos
-const users = [
-    { id: 1, username: 'admin', password: 'admin123', role: 'admin' },
-    { id: 2, username: 'user', password: 'user123', role: 'user' }
-];
-
-// Controlador para iniciar sesión
+// Controlador para ruta de login
 const login = (req, res) => {
     const { username, password } = req.body;
 
-    // Buscar usuario en la base de datos simulada
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    let users = [];
+
+    try {
+        const rawData = fs.readFileSync(path.join(__dirname, '../db/users.json'), 'utf8');
+        if (!rawData.trim()) {
+            throw new Error('users.json is empty');
+        }
+        users = JSON.parse(rawData);
+    } catch (err) {
+        console.error('Error reading or parsing users.json:', err.message);
+        return res.status(500).send('Error en el servidor al leer los usuarios');
+    }
+
     const user = users.find(u => u.username === username && u.password === password);
 
     if (user) {
-        // Generar un token con el ID y rol del usuario
-        const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: '1h' });
-        res.json({ token });
+        // Simulate token generation (replace with real token logic in production)
+        const token = 'fake-jwt-token';
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false, // true en producción con HTTPS
+            sameSite: 'Strict'
+        });
+
+        res.json({ message: 'Login successful' });
     } else {
         res.status(401).send('Invalid Credentials');
     }
 };
 
-console.log('SECRET_KEY:', process.env.SECRET_KEY);
+// Controlador para ruta privada
+const private = (req, res) => {
+    if (req.user?.role === 'admin') {
+        res.send('Privado para administradores');
+    } else {
+        res.status(403).send('Access denied');
+    }
+};
 
-module.exports = { login };
+// Controlador para logout
+const logout = (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: false, // true en producción con HTTPS
+        sameSite: 'Strict'
+    });
+
+    res.json({ message: 'Logout successful' });
+};
+
+module.exports = {
+    login,
+    private,
+    logout
+};
