@@ -1,20 +1,23 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config({ path: './backend/src/.env' });
 
-const authMiddleware = (req, res, next) => {
-    const token = req.cookies.token; 
+exports.verifyToken = (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: 'Token no encontrado' });
 
-    if (!token) {
-        return res.status(401).send('Unauthorized: No token provided');
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(401).send('Invalid token');
-    }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch {
+    res.status(403).json({ error: 'Token inválido' });
+  }
 };
 
-module.exports = authMiddleware;
+exports.requireRole = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'No tienes permisos' });
+    }
+    next();
+  };
+};

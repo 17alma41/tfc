@@ -1,68 +1,45 @@
+const db = require('../config/db');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config({ path: './backend/src/.env' });
 
-// Controlador para ruta de login
-const login = (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
-    }
-
-    let users = [];
-
-    try {
-        const rawData = fs.readFileSync(path.join(__dirname, '../db/users.json'), 'utf8');
-        if (!rawData.trim()) {
-            throw new Error('users.json is empty');
-        }
-        users = JSON.parse(rawData);
-    } catch (err) {
-        console.error('Error reading or parsing users.json:', err.message);
-        return res.status(500).send('Error en el servidor al leer los usuarios');
-    }
-
-    const user = users.find(u => u.username === username && u.password === password);
-
-    if (user) {
-        // Simulate token generation (replace with real token logic in production)
-        const token = 'fake-jwt-token';
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false, // true en producción con HTTPS
-            sameSite: 'Strict'
-        });
-
-        res.json({ message: 'Login successful' });
-    } else {
-        res.status(401).send('Invalid Credentials');
-    }
+const createToken = (user) => {
+  return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
 
-// Controlador para ruta privada
-const private = (req, res) => {
-    if (req.user?.role === 'admin') {
-        res.send('Privado para administradores');
-    } else {
-        res.status(403).send('Access denied');
-    }
+exports.register = (req, res) => {
+  const { name, email, password, role } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  try {
+    const stmt = db.prepare(`INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)`);
+    stmt.run(name, email, hashedPassword, role || 'trabajador');
+    res.status(201).json({ message: 'Usuario registrado correctamente' });
+  } catch (err) {
+    res.status(400).json({ error: 'Error al registrar usuario', details: err.message });
+  }
 };
 
-// Controlador para logout
-const logout = (req, res) => {
-    res.clearCookie('token', {
-        httpOnly: true,
-        secure: false, // true en producción con HTTPS
-        sameSite: 'Strict'
-    });
+exports.login = (req, res) => {
+  const { email, password } = req.body;
 
-    res.json({ message: 'Logout successful' });
+  const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
+  if (!user) return res.status(401).json({ error: 'Usuario no encontrado' });
+
+  const valid = bcrypt.compareSync(password, user.password);
+  if (!valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
+
+  const token = createToken(user);
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'Strict',
+    maxAge: 24 * 60 * 60 * 1000
+  });
+
+  res.json({ message: 'Login exitoso', role: user.role });
 };
 
-module.exports = {
-    login,
-    private,
-    logout
+exports.logout = (req, res) => {
+  res.clearCookie('token');
+  res.json({ message: 'Sesión cerrada' });
 };

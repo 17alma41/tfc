@@ -1,35 +1,28 @@
 const express = require('express');
+require('dotenv').config({ path: __dirname + '/../.env' });
 const cors = require('cors');
-const path = require('path');
 const cookieParser = require('cookie-parser');
-const authRoutes = require('./routes/authRoutes');
-const authMiddleware = require('./middlewares/authMiddleware');
-const roleMiddleware = require('./middlewares/roleMiddleware');
 
-require('dotenv').config({ path: './backend/src/.env' });
+const authRoutes = require('./routes/authRoutes');
+require('./config/db'); // crea tabla
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Habilitar CORS para permitir cookies desde el frontend
 app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
+  origin: 'http://localhost:5173',
+  credentials: true
 }));
-
 app.use(express.json());
 app.use(cookieParser());
 
-// Servir archivos estáticos desde la carpeta "public" (ubicada en raíz del proyecto)
-// app.use(express.static(path.join(__dirname, '..', '..', 'public')));
+app.use('/api/auth', authRoutes);
 
-// Ruta explícita para servir index.html desde public al acceder a "/"
+// Ruta opcional para test
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'));
+  res.send('API funcionando ✅');
 });
 
-app.use('/auth', authRoutes);
+console.log('SECRET JWT:', process.env.JWT_SECRET);
 
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`✅ Backend corriendo en http://localhost:${PORT}`));
