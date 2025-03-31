@@ -12,7 +12,14 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await login(form);
-      alert(`Login exitoso. Rol: ${res.data.role}`);
+      const role = res.data.role;
+      if (role === 'admin') {
+        window.location.href = '/dashboard/AdminDashboard';
+      } else if (role === 'trabajador') {
+        window.location.href = '/dashboard/WorkerDashboard';
+      } else {
+        window.location.href = '/';
+      }
     } catch {
       alert('Login fallido');
     }

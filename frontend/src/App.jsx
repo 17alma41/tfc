@@ -1,12 +1,40 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import AdminDashboard from './dashboard/AdminDashboard';
+import WorkerDashboard from './dashboard/WorkerDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <div style={{ display: 'flex', gap: '3rem' }}>
-      <Register />
-      <Login />
-    </div>
+    <Router>
+      <Routes>
+        {/* Rutas públicas */}
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Rutas protegidas */}
+        <Route
+          path="/dashboard/admin"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/worker"
+          element={
+            <ProtectedRoute role="trabajador">
+              <WorkerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Ruta por defecto */}
+        <Route path="/" element={<h1>Bienvenido a la aplicación</h1>} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -43,3 +43,21 @@ exports.logout = (req, res) => {
   res.clearCookie('token');
   res.json({ message: 'Sesión cerrada' });
 };
+
+exports.getProfile = (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: 'No autenticado' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = db.prepare(`SELECT id, name, email, role FROM users WHERE id = ?`).get(decoded.id);
+
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    res.json(user); // devolvemos solo los campos necesarios
+  } catch (err) {
+    res.status(401).json({ error: 'Token inválido' });
+  }
+};  
+
+
