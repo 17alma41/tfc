@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import AdminDashboard from './dashboard/AdminDashboard';
 import WorkerDashboard from './dashboard/WorkerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
+import Services from './pages/Services';
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
           element={
             <ProtectedRoute role="trabajador">
               <WorkerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/services"
+          element={
+            <ProtectedRoute roles={['admin', 'trabajador']}>
+              <Services />
             </ProtectedRoute>
           }
         />

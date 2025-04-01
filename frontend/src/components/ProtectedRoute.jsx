@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children, role }) => {
+const ProtectedRoute = ({ children, roles }) => {
   const { user, isAuthenticated, loading } = useAuth();
 
   // Mientras se verifica la autenticación, muestra un indicador de carga
@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, role }) => {
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   // Si se requiere un rol específico y el usuario no lo tiene, redirige al inicio
-  if (role && user.role !== role) return <Navigate to="/" />;
+  if (roles && !roles.includes(user.role)) return <Navigate to="/" />;
 
   // Si pasa todas las verificaciones, renderiza el contenido protegido
   return children;

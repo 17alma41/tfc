@@ -14,9 +14,9 @@ export default function Login() {
       const res = await login(form);
       const role = res.data.role;
       if (role === 'admin') {
-        window.location.href = '/dashboard/AdminDashboard';
+        window.location.href = '/dashboard/admin';
       } else if (role === 'trabajador') {
-        window.location.href = '/dashboard/WorkerDashboard';
+        window.location.href = '/dashboard/worker';
       } else {
         window.location.href = '/';
       }
