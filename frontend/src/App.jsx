@@ -4,7 +4,7 @@ import Login from './pages/Login';
 import AdminDashboard from './dashboard/AdminDashboard';
 import WorkerDashboard from './dashboard/WorkerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import Services from './pages/Services';
+import Services from './components/ServiceManager';
 
 function App() {
   return (

@@ -1,15 +1,19 @@
 const db = require('../config/db');
 
 exports.createService = (req, res) => {
-  const { title, description, price } = req.body;
-  const createdBy = req.user.id;
-
   try {
-    const stmt = db.prepare(`INSERT INTO services (title, description, price, created_by) VALUES (?, ?, ?, ?)`);
-    stmt.run(title, description, price, createdBy);
-    res.status(201).json({ message: 'Servicio creado correctamente' });
+    const { title, description, price, duration } = req.body;
+    const created_by = req.user.id;
+
+    const stmt = db.prepare(`
+      INSERT INTO services (title, description, price, duration, created_by)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    const result = stmt.run(title, description, price, duration, created_by);
+
+    res.status(201).json({ id: result.lastInsertRowid, title, description, price, duration });
   } catch (err) {
-    res.status(400).json({ error: 'Error al crear servicio', details: err.message });
+    res.status(500).json({ error: 'Error al crear servicio', details: err.message });
   }
 };
 

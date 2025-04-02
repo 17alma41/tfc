@@ -19,6 +19,7 @@ db.prepare(`
     title TEXT NOT NULL,
     description TEXT,
     price REAL NOT NULL,
+    duration INTEGER NOT NULL,
     created_by INTEGER NOT NULL,
     FOREIGN KEY (created_by) REFERENCES users(id)
   )
