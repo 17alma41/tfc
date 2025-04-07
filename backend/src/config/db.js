@@ -25,4 +25,23 @@ db.prepare(`
   )
 `).run();
 
+// Crear tabla reservations si no existe
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS reservations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_name TEXT NOT NULL,
+    user_email TEXT NOT NULL,
+    user_phone TEXT NOT NULL,
+    service_id INTEGER NOT NULL,
+    worker_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    time TEXT NOT NULL,
+    status TEXT DEFAULT 'pendiente',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (service_id) REFERENCES services(id),
+    FOREIGN KEY (worker_id) REFERENCES users(id)
+  )
+`).run();
+
+
 module.exports = db;
