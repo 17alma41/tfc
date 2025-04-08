@@ -43,5 +43,29 @@ db.prepare(`
   )
 `).run();
 
+// Tabla: disponibilidad semanal del trabajador (ej: lunes: 09:00–14:00)
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS worker_availability (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    worker_id INTEGER NOT NULL,
+    day_of_week TEXT NOT NULL, -- Ej: 'monday', 'tuesday'
+    start_time TEXT NOT NULL,  -- Ej: '09:00'
+    end_time TEXT NOT NULL,    -- Ej: '14:00'
+    FOREIGN KEY (worker_id) REFERENCES users(id)
+  )
+`).run();
+
+// Tabla: días no disponibles del trabajador
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS worker_unavailable_days (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    worker_id INTEGER NOT NULL,
+    date TEXT NOT NULL, -- formato ISO: YYYY-MM-DD
+    reason TEXT,
+    FOREIGN KEY (worker_id) REFERENCES users(id)
+  )
+`).run();
+
+
 
 module.exports = db;

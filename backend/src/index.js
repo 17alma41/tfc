@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
+const availabilityRoutes = require('./routes/availabilityRoutes');
 require('./config/db'); // crea tabla
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/availability', availabilityRoutes);
 
 // Ruta opcional para test
 app.get('/', (req, res) => {

@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const reservationController = require('../controllers/reservationController');
-const { requireAuth, requireRole } = require('../middleware/authMiddleware');
+const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
 
 // Crear reserva (pública)
 router.post('/', reservationController.createReservation);
+// Disponibilidad del trabajador logueado 
+router.get('/available-slots', verifyToken, reservationController.getWorkerAvailability);
 
 // Ver reservas del trabajador logueado
-router.get('/mine', requireAuth, requireRole(['trabajador']), reservationController.getReservationsByWorker);
+router.get('/mine', verifyToken, requireRole(['trabajador']), reservationController.getReservationsByWorker);
+
 
 module.exports = router;

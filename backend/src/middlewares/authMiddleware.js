@@ -2,22 +2,31 @@ const jwt = require('jsonwebtoken');
 
 exports.verifyToken = (req, res, next) => {
   const token = req.cookies.token;
-  if (!token) return res.status(401).json({ error: 'Token no encontrado' });
+
+  if (!token) {
+    console.log('❌ Token no encontrado');
+    return res.status(401).json({ error: 'No estás autenticado' });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; 
+    //console.log('✅ Token válido. Usuario:', decoded);
     next();
-  } catch {
-    res.status(403).json({ error: 'Token inválido' });
+  } catch (err) {
+    console.log('❌ Token inválido');
+    return res.status(403).json({ error: 'Token inválido' });
   }
 };
 
-exports.requireRole = (...roles) => {
+
+exports.requireRole = (roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'No tienes permisos' });
+    //console.log('🔒 Comprobando rol, usuario:', req.user);
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'No tienes permisos para acceder a esta ruta' });
     }
     next();
   };
 };
+

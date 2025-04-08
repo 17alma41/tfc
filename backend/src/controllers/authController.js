@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const createToken = (user) => {
-  return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+  return jwt.sign({ id: user.id, role: user.role, name: user.name }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
 
 exports.register = (req, res) => {
@@ -32,7 +32,7 @@ exports.login = (req, res) => {
   res.cookie('token', token, {
     httpOnly: true,
     secure: false,
-    sameSite: 'Strict',
+    sameSite: 'Lax',
     maxAge: 24 * 60 * 60 * 1000
   });
 
