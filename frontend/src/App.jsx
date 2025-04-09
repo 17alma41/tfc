@@ -6,15 +6,20 @@ import WorkerDashboard from './dashboard/WorkerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Services from './components/ServiceManager';
 
+import WorkerProfile from './components/WorkerProfile';
+import MyReservations from './components/MyReservations';
+import AvailabilityManager from './components/AvailabilityManager';
+
 function App() {
   return (
     <Router>
       <Routes>
+
         {/* Rutas públicas */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Rutas protegidas */}
+        {/* Dashboard administrador */}
         <Route
           path="/dashboard/admin"
           element={
@@ -23,6 +28,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Dashboard trabajador con rutas anidadas */}
         <Route
           path="/dashboard/worker"
           element={
@@ -30,7 +37,13 @@ function App() {
               <WorkerDashboard />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="profile" element={<WorkerProfile />} />
+          <Route path="reservas" element={<MyReservations />} />
+          <Route path="disponibilidad" element={<AvailabilityManager />} />
+        </Route>
+
+        {/* Página de servicios */}
         <Route
           path="/services"
           element={
@@ -40,7 +53,7 @@ function App() {
           }
         />
 
-        {/* Ruta por defecto */}
+        {/* Página de inicio por defecto */}
         <Route path="/" element={<h1>Bienvenido a la aplicación</h1>} />
       </Routes>
     </Router>

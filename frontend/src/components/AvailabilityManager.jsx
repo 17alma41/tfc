@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
@@ -7,18 +7,20 @@ const daysOfWeek = [
 ];
 
 const AvailabilityManager = () => {
-    const { user } = useAuth();
+  const { user } = useAuth();
+
   const [availability, setAvailability] = useState([]);
-  const [newSlot, setNewSlot] = useState({
+  const [form, setForm] = useState({
     day_of_week: 'monday',
     start_time: '',
     end_time: ''
   });
+  const [editingId, setEditingId] = useState(null);
 
   const fetchAvailability = async () => {
     try {
       const res = await axios.get(`/api/availability/${user.id}`, {
-        withCredentials: true,
+        withCredentials: true
       });
       setAvailability(res.data);
     } catch (err) {
@@ -27,68 +29,120 @@ const AvailabilityManager = () => {
   };
 
   useEffect(() => {
-    if (user?.id) {
-      fetchAvailability();
-    }
+    if (user?.id) fetchAvailability();
   }, [user]);
 
-  const handleAddSlot = async () => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-      await axios.post('/api/availability', {
-        ...newSlot,
-        worker_id: user.id
-      }, { withCredentials: true });
+      if (editingId) {
+        // Actualizar horario
+        await axios.put(`/api/availability/${editingId}`, form, {
+          withCredentials: true
+        });
+      } else {
+        // Crear nuevo horario
+        await axios.post('/api/availability', {
+          ...form,
+          worker_id: user.id
+        }, {
+          withCredentials: true
+        });
+      }
+
+      setForm({ day_of_week: 'monday', start_time: '', end_time: '' });
+      setEditingId(null);
       fetchAvailability();
-      setNewSlot({ day_of_week: 'monday', start_time: '', end_time: '' });
     } catch (err) {
-      console.error('Error al añadir disponibilidad:', err);
+      console.error('Error al guardar disponibilidad:', err);
     }
   };
 
-  const handleDeleteSlot = async (id) => {
+  const handleEdit = (slot) => {
+    setForm({
+      day_of_week: slot.day_of_week,
+      start_time: slot.start_time,
+      end_time: slot.end_time
+    });
+    setEditingId(slot.id);
+  };
+
+  const handleDelete = async (id) => {
+    const confirm = window.confirm('¿Eliminar este bloque de horario?');
+    if (!confirm) return;
+
     try {
-      await axios.delete(`/api/availability/${id}`, { withCredentials: true });
+      await axios.delete(`/api/availability/${id}`, {
+        withCredentials: true
+      });
       fetchAvailability();
     } catch (err) {
-      console.error('Error al eliminar franja:', err);
+      console.error('Error al eliminar disponibilidad:', err);
     }
+  };
+
+  const cancelEdit = () => {
+    setForm({ day_of_week: 'monday', start_time: '', end_time: '' });
+    setEditingId(null);
   };
 
   return (
     <div>
-      <h2>Mi disponibilidad semanal</h2>
+      <h2>Gestión de disponibilidad</h2>
 
-      <div style={{ marginBottom: '1rem' }}>
+      <form onSubmit={handleSubmit}>
+        <h3>{editingId ? 'Editar horario' : 'Añadir nuevo horario'}</h3>
+
         <select
-          name="day"
-          value={newSlot.day_of_week}
-          onChange={(e) => setNewSlot({ ...newSlot, day_of_week: e.target.value })}
+          name="day_of_week"
+          value={form.day_of_week}
+          onChange={handleChange}
+          required
         >
-          {daysOfWeek.map((day) => (
-            <option key={day} value={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</option>
+          {daysOfWeek.map(day => (
+            <option key={day} value={day}>
+              {day.charAt(0).toUpperCase() + day.slice(1)}
+            </option>
           ))}
         </select>
-        <input
-          type="time"
-          value={newSlot.start_time}
-          onChange={(e) => setNewSlot({ ...newSlot, start_time: e.target.value })}
-        />
-        <input
-          type="time"
-          value={newSlot.end_time}
-          onChange={(e) => setNewSlot({ ...newSlot, end_time: e.target.value })}
-        />
-        <button onClick={handleAddSlot}>Añadir</button>
-      </div>
 
+        <input
+          type="time"
+          name="start_time"
+          value={form.start_time}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="time"
+          name="end_time"
+          value={form.end_time}
+          onChange={handleChange}
+          required
+        />
+
+        <button type="submit">{editingId ? 'Actualizar' : 'Crear'}</button>
+        {editingId && <button type="button" onClick={cancelEdit}>Cancelar</button>}
+      </form>
+
+      <hr />
+
+      <h3>Disponibilidad actual</h3>
       {availability.length === 0 ? (
-        <p>No tienes disponibilidad configurada.</p>
+        <p>No tienes horarios configurados.</p>
       ) : (
         <ul>
-          {availability.map((slot) => (
+          {availability.map(slot => (
             <li key={slot.id}>
-              <strong>{slot.day_of_week}</strong>: {slot.start_time} - {slot.end_time}
-              <button onClick={() => handleDeleteSlot(slot.id)}>Eliminar</button>
+              <strong>{slot.day_of_week}</strong>: {slot.start_time} – {slot.end_time}
+              <button onClick={() => handleEdit(slot)}>Editar</button>
+              <button onClick={() => handleDelete(slot.id)}>Eliminar</button>
             </li>
           ))}
         </ul>

@@ -1,20 +1,19 @@
 import MyReservations from '../components/MyReservations';
 import AvailabilityManager from '../components/AvailabilityManager';
 import { useAuth } from '../context/AuthContext';
+import { Link, Outlet } from 'react-router-dom';
 
 
 const WorkerDashboard = () => {
-  const { user } = useAuth();
-
-  console.log(user)
-  console.log(user.role)
-
   return (
     <div>
       <h1>Panel del trabajador</h1>
-      <MyReservations />
-      <hr />
-      <AvailabilityManager />
+      <nav style={{ marginBottom: '1rem' }}>
+        <Link to="profile" style={{ marginRight: '1rem' }}>Mi Perfil</Link>
+        <Link to="reservas" style={{ marginRight: '1rem' }}>Mis Reservas</Link>
+        <Link to="disponibilidad">Disponibilidad</Link>
+      </nav>
+      <Outlet />
     </div>
   );
 };
