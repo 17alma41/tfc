@@ -1,6 +1,3 @@
-import MyReservations from '../components/MyReservations';
-import AvailabilityManager from '../components/AvailabilityManager';
-import { useAuth } from '../context/AuthContext';
 import { Link, Outlet } from 'react-router-dom';
 
 

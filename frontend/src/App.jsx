@@ -1,12 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import Unauthorized from './pages/Unauthorized';
 import AdminDashboard from './dashboard/AdminDashboard';
 import WorkerDashboard from './dashboard/WorkerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import Services from './components/ServiceManager';
+import ServiceManager from './components/ServiceManager';
 
 import WorkerProfile from './components/WorkerProfile';
+import AdminProfile from './components/AdminProfile';
 import MyReservations from './components/MyReservations';
 import AvailabilityManager from './components/AvailabilityManager';
 
@@ -19,7 +21,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Dashboard administrador */}
+        {/* Dashboard administrador con rutas anidadas*/}
         <Route
           path="/dashboard/admin"
           element={
@@ -27,7 +29,10 @@ function App() {
               <AdminDashboard />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="services" element={<ServiceManager />} />
+        </Route>
 
         {/* Dashboard trabajador con rutas anidadas */}
         <Route
@@ -48,13 +53,17 @@ function App() {
           path="/services"
           element={
             <ProtectedRoute roles={['admin', 'trabajador']}>
-              <Services />
+              <ServiceManager />
             </ProtectedRoute>
           }
         />
 
         {/* Página de inicio por defecto */}
         <Route path="/" element={<h1>Bienvenido a la aplicación</h1>} />
+
+        {/* Página no autorizada */}  
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
       </Routes>
     </Router>
   );

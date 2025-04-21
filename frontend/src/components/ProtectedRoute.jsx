@@ -1,19 +1,21 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children, roles }) => {
+const ProtectedRoute = ({ children, role, roles }) => {
   const { user, isAuthenticated, loading } = useAuth();
 
-  // Mientras se verifica la autenticación, muestra un indicador de carga
   if (loading) return <div>Cargando...</div>;
 
-  // Si no está autenticado, redirige al login
+  // Si el usuario no está autenticado, redirigir a la página de inicio de sesión
   if (!isAuthenticated) return <Navigate to="/login" />;
 
-  // Si se requiere un rol específico y el usuario no lo tiene, redirige al inicio
-  if (roles && !roles.includes(user.role)) return <Navigate to="/" />;
+  const allowedRoles = roles || (role ? [role] : []);
 
-  // Si pasa todas las verificaciones, renderiza el contenido protegido
+  // Si se especifica un rol y el usuario no tiene ese rol, redirigir a la página de acceso no autorizado
+  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
   return children;
 };
 
