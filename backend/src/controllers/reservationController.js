@@ -80,7 +80,10 @@ function getAvailableSlots(worker_id, date, service_duration) {
     SELECT * FROM worker_unavailable_days WHERE worker_id = ? AND date = ?
   `).get(worker_id, date);
 
-  if (unavailable) return [];
+  if (unavailable){
+    console.log(`⛔ Trabajador ${worker_id} no está disponible el día ${date}`);
+    return [];
+  } 
 
   const dayOfWeek = dayjs(date).format('dddd').toLowerCase();
 

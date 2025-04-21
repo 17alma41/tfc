@@ -6,11 +6,12 @@ import AdminDashboard from './dashboard/AdminDashboard';
 import WorkerDashboard from './dashboard/WorkerDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ServiceManager from './components/ServiceManager';
-
 import WorkerProfile from './components/WorkerProfile';
 import AdminProfile from './components/AdminProfile';
 import MyReservations from './components/MyReservations';
 import AvailabilityManager from './components/AvailabilityManager';
+import UnavailableDaysManager from './components/UnavailableDaysManager';
+import BookingPage from './pages/BookingPage';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         {/* Rutas públicas */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/reservar" element={<BookingPage />} />
 
         {/* Dashboard administrador con rutas anidadas*/}
         <Route
@@ -46,6 +48,7 @@ function App() {
           <Route path="profile" element={<WorkerProfile />} />
           <Route path="reservas" element={<MyReservations />} />
           <Route path="disponibilidad" element={<AvailabilityManager />} />
+          <Route path="descansos" element={<UnavailableDaysManager />} />
         </Route>
 
         {/* Página de servicios */}
