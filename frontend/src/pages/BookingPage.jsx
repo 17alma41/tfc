@@ -22,13 +22,19 @@ const BookingPage = () => {
 
   useEffect(() => {
     if (selectedWorker && date && selectedService) {
-      const service = services.find(s => s.id === parseInt(selectedService));
-      if (!service) return;
-      getAvailableSlots(selectedWorker, date, service.duration).then(res => {
-        setSlots(res.data);
-      });
+      const service = services.find(s => s.id === +selectedService);
+      if (!service?.duration) {
+        console.error('Servicio sin duración definida:', service);
+        return;
+      }
+      getAvailableSlots(selectedWorker, date, service.duration)
+        .then(res => setSlots(res.data))
+        .catch(err => console.error('Error slots:', err));
+    } else {
+      setSlots([]); // limpia si cambia worker/fecha/servicio
     }
   }, [selectedWorker, date, selectedService]);
+  
 
   const handleReservation = async () => {
     try {
@@ -79,20 +85,28 @@ const BookingPage = () => {
         onChange={(e) => setDate(e.target.value)}
       />
 
-      {slots.length > 0 && (
+      {slots.length > 0 ? (
         <div>
           <h4>Horarios disponibles:</h4>
-          {slots.map((slot, i) => (
+          {slots.map((slot) => (
             <button
-              key={i}
+              key={slot}
               onClick={() => setSelectedTime(slot)}
-              style={{ margin: '0.25rem', background: selectedTime === slot ? 'lightblue' : '' }}
+              style={{
+                margin: '0.25rem',
+                background: selectedTime === slot ? 'lightblue' : ''
+              }}
             >
               {slot}
             </button>
           ))}
         </div>
+      ) : (
+        (selectedWorker && date && selectedService)
+          ? <p>No hay horas disponibles.</p>
+          : null
       )}
+
 
       <h4>Tus datos</h4>
       <input placeholder="Nombre" onChange={e => setClientInfo({ ...clientInfo, name: e.target.value })} />

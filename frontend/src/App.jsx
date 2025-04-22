@@ -12,6 +12,7 @@ import MyReservations from './components/MyReservations';
 import AvailabilityManager from './components/AvailabilityManager';
 import UnavailableDaysManager from './components/UnavailableDaysManager';
 import BookingPage from './pages/BookingPage';
+import WelcomePage from './pages/WelcomePage';
 
 function App() {
   return (
@@ -62,7 +63,17 @@ function App() {
         />
 
         {/* Página de inicio por defecto */}
-        <Route path="/" element={<h1>Bienvenido a la aplicación</h1>} />
+        <Route 
+          path="/" 
+          element={
+            <WelcomePage />
+          } 
+        > 
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="reservar" element={<MyReservations />} />
+
+        </Route>/
 
         {/* Página no autorizada */}  
         <Route path="/unauthorized" element={<Unauthorized />} />
