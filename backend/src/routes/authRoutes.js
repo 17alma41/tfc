@@ -25,7 +25,18 @@ router.get('/workers', (req, res) => {
       console.error('❌ Error al obtener trabajadores:', err);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
-  });
-  
+});
+
+router.get('/users/workers', verifyToken, requireRole(['admin']), (req, res) => {
+  try {
+    const workers = db.prepare(`
+      SELECT id, name, email FROM users WHERE role = 'trabajador'
+    `).all();
+    res.json(workers);
+  } catch (err) {
+    console.error('Error al obtener trabajadores:', err);
+    res.status(500).json({ error: 'Error al obtener trabajadores' });
+  }
+});
 
 module.exports = router;

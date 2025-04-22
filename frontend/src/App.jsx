@@ -11,6 +11,7 @@ import AdminProfile from './components/AdminProfile';
 import MyReservations from './components/MyReservations';
 import AvailabilityManager from './components/AvailabilityManager';
 import UnavailableDaysManager from './components/UnavailableDaysManager';
+import WorkerAdminPanel from './components/WorkerAdminPanel';
 import BookingPage from './pages/BookingPage';
 import WelcomePage from './pages/WelcomePage';
 
@@ -35,6 +36,7 @@ function App() {
         >
           <Route path="profile" element={<AdminProfile />} />
           <Route path="services" element={<ServiceManager />} />
+          <Route path="trabajadores" element={<WorkerAdminPanel />} />
         </Route>
 
         {/* Dashboard trabajador con rutas anidadas */}
@@ -70,7 +72,8 @@ function App() {
           } 
         > 
           <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route path="/dashboard/admin" element={<AdminDashboard />} />
+          <Route path="/dashboard/worker" element={<WorkerDashboard />} />
           <Route path="reservar" element={<MyReservations />} />
 
         </Route>/

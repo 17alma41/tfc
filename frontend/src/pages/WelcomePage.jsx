@@ -1,18 +1,39 @@
 import { Link, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Asegúrate de tener un contexto de autenticación
+import { useAuth } from '../context/AuthContext';
 
 const WelcomePage = () => {
-  const { user } = useAuth(); // Obtén el usuario autenticado y su rol
+    const { user, isAuthenticated, logout } = useAuth(); // Obtén el usuario autenticado y su rol
 
   return (
     <div>
       <h1>Bienvenido a la aplicación</h1>
       <nav style={{ marginBottom: '1rem' }}>
-        <Link to="login" style={{ marginRight: '1rem' }}>Login</Link>
-        {user?.role === 'admin' && (
-          <Link to="register" style={{ marginRight: '1rem' }}>Register</Link>
+
+        {/* Si NO está autenticado, se muestra Login */}
+        {!isAuthenticated && (
+          <>
+            <Link to="login" style={{ marginRight: '1rem' }}>Login</Link>
+          </>
         )}
+
+        {/* Si está autenticado y es admin, muestro su dashboard*/}
+        {isAuthenticated && user.role === 'admin' && (
+          <Link to="/dashboard/admin" style={{ marginRight: '1rem' }}>Mi panel Admin</Link>
+        )}
+
+        {/* Si está autenticado y es trabajador, muestro su dashboard */}
+         {isAuthenticated && user.role === 'trabajador' && (
+          <Link to="/dashboard/worker" style={{ marginRight: '1rem' }}>Mi panel Trabajador</Link>
+        )}
+
         <Link to="reservar" style={{ marginRight: '1rem' }}>Reservar</Link>
+
+        {/* Si está autenticado, muestro botón para cerrar sesión
+        {isAuthenticated && (
+          <button onClick={logout} style={{ marginLeft: '2rem' }}>Cerrar sesión</button>
+        )}
+        */}
+        
       </nav>
       <Outlet />
     </div>

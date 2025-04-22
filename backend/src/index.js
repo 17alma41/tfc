@@ -8,6 +8,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
 const unavailableDaysRoutes = require('./routes/unavailableDaysRoutes');
+const usersRoutes = require('./routes/usersRoutes');
 require('./config/db'); // crea tabla
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/unavailable-days', unavailableDaysRoutes);
+app.use('/api/users', usersRoutes);
 
 // Ruta opcional para test
 app.get('/', (req, res) => {

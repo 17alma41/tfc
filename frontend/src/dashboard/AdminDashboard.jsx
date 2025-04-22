@@ -7,7 +7,9 @@ const AdminDashboard = () => {
       <nav style={{ marginBottom: '1rem' }}>
         {/* Rutas anidadas */}
         <Link to="profile" style={{ marginRight: '1rem' }}>Mi Perfil</Link>
-        <Link to="services">Gestionar Servicios</Link>
+        <Link to="services" style={{ marginRight: '1rem' }}>Gestionar Servicios</Link>
+        <Link to="trabajadores">Gestionar trabajadores</Link>
+
       </nav>
 
       <Outlet />
