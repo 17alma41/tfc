@@ -8,7 +8,7 @@ db.prepare(`
     name TEXT,
     email TEXT UNIQUE,
     password TEXT,
-    role TEXT CHECK(role IN ('admin', 'trabajador')) DEFAULT 'trabajador'
+    role TEXT CHECK(role IN ('superadmin', 'admin', 'encargado', 'trabajador', 'cliente')) DEFAULT 'cliente'
   )
 `).run();
 
@@ -65,7 +65,5 @@ db.prepare(`
     FOREIGN KEY (worker_id) REFERENCES users(id)
   )
 `).run();
-
-
 
 module.exports = db;

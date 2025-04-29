@@ -3,7 +3,6 @@ const db = require('../config/db');
 const router = express.Router();
 const { register, login, logout, getProfile } = require('../controllers/authController');
 const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
-
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
@@ -17,7 +16,7 @@ router.get('/worker-data', verifyToken, requireRole('trabajador'), (req, res) =>
     res.json({ message: 'Datos solo para trabajadores' });
 });
 
-router.get('/workers', (req, res) => {
+router.get('/users', (req, res) => {
     try {
       const workers = db.prepare(`SELECT id, name FROM users WHERE role = 'trabajador'`).all();
       res.json(workers);

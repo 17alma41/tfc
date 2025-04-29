@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getServices } from '../services/serviceService';
-import { getWorkers } from '../services/authService';
+import { getPublicWorkers } from '../services/userService';
 import { getAvailableSlots, createReservation } from '../services/bookingService';
 import dayjs from 'dayjs';
 
@@ -16,7 +16,10 @@ const BookingPage = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    getWorkers().then(res => setWorkers(res.data));
+    getPublicWorkers()
+    .then(res => setWorkers(res.data))
+    .catch(err => console.error('Error al cargar trabajadores públicos:', err));
+
     getServices().then(res => setServices(res.data));
   }, []);
 

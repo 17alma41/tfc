@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState } from 'react';
 
-const AdminProfile = () => {
+const SuperAdminProfile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
@@ -21,7 +21,7 @@ const AdminProfile = () => {
     }
   };
 
-  if (!user) return <p>Cargando perfil del administrador...</p>;
+  if (!user) return <p>Cargando perfil del super administrador...</p>;
 
   return (
     <div>
@@ -37,4 +37,4 @@ const AdminProfile = () => {
   );
 };
 
-export default AdminProfile;
+export default SuperAdminProfile;

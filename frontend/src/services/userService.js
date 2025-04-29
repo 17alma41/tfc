@@ -1,13 +1,13 @@
 import axios from 'axios';
+const api = axios.create({
+  baseURL: '/api/users',
+  withCredentials: true
+});
 
-export const getAllWorkers = () =>
-  axios.get('/api/users/workers', { withCredentials: true });
-
-export const getWorkerReservations = (id) =>
-  axios.get(`/api/users/${id}/reservations`, { withCredentials: true });
-
-export const updateWorker = (id, data) =>
-  axios.put(`/api/users/${id}`, data, { withCredentials: true });
-
-export const deleteWorker = (id) =>
-  axios.delete(`/api/users/${id}`, { withCredentials: true });
+export const getAllUsers = () => api.get('/');
+export const getWorkers  = () => api.get('/workers');
+export const createUser  = data => api.post('/', data);
+export const updateUser  = (id, data) => api.put(`/${id}`, data);
+export const deleteUser  = id => api.delete(`/${id}`);
+export const getUserReservations = id => api.get(`/${id}/reservations`);
+export const getPublicWorkers = () => api.get('/public-workers');

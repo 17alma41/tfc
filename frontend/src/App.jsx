@@ -8,10 +8,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ServiceManager from './components/ServiceManager';
 import WorkerProfile from './components/WorkerProfile';
 import AdminProfile from './components/AdminProfile';
+import SuperAdminProfile  from  './components/SuperAdminProfile';
 import MyReservations from './components/MyReservations';
 import AvailabilityManager from './components/AvailabilityManager';
 import UnavailableDaysManager from './components/UnavailableDaysManager';
-import WorkerAdminPanel from './components/WorkerAdminPanel';
+import UserAdminPanel from './components/UserAdminPanel';
+import SuperAdminDashboard from './dashboard/SuperAdminDashboard';
 import BookingPage from './pages/BookingPage';
 import WelcomePage from './pages/WelcomePage';
 
@@ -25,6 +27,21 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/reservar" element={<BookingPage />} />
 
+        {/* Dashboard superadmin con rutas anidadas*/}
+        <Route
+          path="/dashboard/superadmin"
+          element={
+            <ProtectedRoute role="superadmin">
+              <SuperAdminDashboard />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="profile"      element={<SuperAdminProfile />} />
+          <Route path="users"        element={<UserAdminPanel />} />
+          <Route path="services"     element={<ServiceManager />} />
+          <Route path="availability" element={<AvailabilityManager />} />
+        </Route>
+
         {/* Dashboard administrador con rutas anidadas*/}
         <Route
           path="/dashboard/admin"
@@ -36,7 +53,7 @@ function App() {
         >
           <Route path="profile" element={<AdminProfile />} />
           <Route path="services" element={<ServiceManager />} />
-          <Route path="trabajadores" element={<WorkerAdminPanel />} />
+          <Route path="trabajadores" element={<UserAdminPanel />} />
         </Route>
 
         {/* Dashboard trabajador con rutas anidadas */}
@@ -72,6 +89,7 @@ function App() {
           } 
         > 
           <Route path="login" element={<Login />} />
+          <Route path="/dashboard/superadmin" element={<SuperAdminDashboard />} />
           <Route path="/dashboard/admin" element={<AdminDashboard />} />
           <Route path="/dashboard/worker" element={<WorkerDashboard />} />
           <Route path="reservar" element={<MyReservations />} />

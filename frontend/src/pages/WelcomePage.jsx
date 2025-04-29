@@ -16,6 +16,11 @@ const WelcomePage = () => {
           </>
         )}
 
+         {/* Si está autenticado y es superadmin, muestro su dashboard*/}
+         {isAuthenticated && user.role === 'superadmin' && (
+          <Link to="/dashboard/superadmin" style={{ marginRight: '1rem' }}>Mi panel Super Admin</Link>
+        )}
+        
         {/* Si está autenticado y es admin, muestro su dashboard*/}
         {isAuthenticated && user.role === 'admin' && (
           <Link to="/dashboard/admin" style={{ marginRight: '1rem' }}>Mi panel Admin</Link>

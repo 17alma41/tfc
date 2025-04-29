@@ -8,14 +8,31 @@ const createToken = (user) => {
 
 exports.register = (req, res) => {
   const { name, email, password, role } = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  let assignedRole = 'cliente';
 
+  // Si piden superadmin, solo en dev y con secret
+  if (role === 'superadmin') {
+    if (process.env.NODE_ENV === 'development') {
+      assignedRole = 'superadmin';
+    } else {
+      return res.status(403).json({ error: 'No autorizado para crear superadmin en producción' });
+    }
+    } else if (['admin','encargado','trabajador','cliente'].includes(role)) {
+      assignedRole = role;
+    }
+
+  const hashed = bcrypt.hashSync(password, 10);
   try {
-    const stmt = db.prepare(`INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)`);
-    stmt.run(name, email, hashedPassword, role || 'trabajador');
-    res.status(201).json({ message: 'Usuario registrado correctamente' });
+    db.prepare(
+      `INSERT INTO users (name, email, password, role)
+       VALUES (?, ?, ?, ?)`
+    ).run(name, email, hashed, assignedRole);
+    res.status(201).json({ message: 'Usuario registrado', role: assignedRole });
   } catch (err) {
-    res.status(400).json({ error: 'Error al registrar usuario', details: err.message });
+    if (err.message.includes('UNIQUE constraint')) {
+      return res.status(409).json({ error: 'Email ya registrado' });
+    }
+    res.status(500).json({ error: 'Error interno al registrar' });
   }
 };
 
