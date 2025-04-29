@@ -25,6 +25,18 @@ exports.createReservation = (req, res) => {
       return res.status(400).json({ error: 'No puedes reservar en el pasado' });
     }
 
+    // Verificar que el servicio existe
+    const serviceExists = db.prepare(`SELECT id FROM services WHERE id = ?`).get(service_id);
+    if (!serviceExists) {
+      return res.status(400).json({ error: 'El servicio seleccionado no existe' });
+    }
+
+    // Verificar que el trabajador existe y tiene el rol correcto
+    const workerExists = db.prepare(`SELECT id FROM users WHERE id = ? AND role = 'trabajador'`).get(worker_id);
+    if (!workerExists) {
+      return res.status(400).json({ error: 'El trabajador seleccionado no existe o no es válido' });
+    }
+
     // Verificar solapamiento 
     const conflict = db.prepare(`
       SELECT * FROM reservations
