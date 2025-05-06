@@ -30,3 +30,17 @@
    
     - Backend: http://localhost:3000
     - Frontend: http://localhost:5173
+
+### Probar la aplicación como un usuario
+
+#### Cliente:
+
+**Email**: alvaro@gmail.com
+
+**Password**: 123
+
+#### Admin:
+
+**Email**: admin@gmail.com
+
+**Password**: admin
