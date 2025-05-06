@@ -1,51 +1,19 @@
-import { useEffect, useState } from 'react';
-import { getClientReservations } from '../services/bookingService';
+import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-export default function ClientDashboard() {
-  const { user, loading } = useAuth();
-  const [reservations, setReservations] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!loading) {
-      getClientReservations()
-        .then(res => setReservations(res.data))
-        .catch(err => setError(err.response?.data?.error || 'Error al cargar reservas'));
-    }
-  }, [loading]);
-
-  if (loading) return <p>Cargando tu historial…</p>;
-  if (error)   return <p style={{color:'red'}}>{error}</p>;
+const ClientDashboard = () => {
+  const { logout } = useAuth();
 
   return (
     <div>
-      <h1>Historial de reservas</h1>
-      {reservations.length === 0
-        ? <p>No tienes reservas aún.</p>
-        : (
-          <table border="1" cellPadding="6">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Servicio</th>
-                <th>Trabajador</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reservations.map(r => (
-                <tr key={r.id}>
-                  <td>{r.date}</td>
-                  <td>{r.time}</td>
-                  <td>{r.service_title}</td>
-                  <td>{r.worker_name}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )
-      }
+      <h1>Panel de Cliente</h1>
+      <nav style={{ marginBottom: '1rem' }}>
+        <Link to="profile" style={{ marginRight: '1rem' }}>Mi Perfil</Link>
+        <Link to="reservas" style={{ marginRight: '1rem' }}>Mi Historial</Link>
+      </nav>
+      <Outlet />
     </div>
   );
-}
+};
+
+export default ClientDashboard;

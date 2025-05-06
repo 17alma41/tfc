@@ -34,7 +34,7 @@ const WelcomePage = () => {
         {/* Si está autenticado y es cliente, muestro su dashboard */}
         {isAuthenticated && user.role === 'cliente' && (
         <Link to="/dashboard/client" style={{ marginRight: '1rem' }}>
-        Mis reservas
+          Mi panel
         </Link>
         )}
 

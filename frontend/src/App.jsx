@@ -15,6 +15,8 @@ import UnavailableDaysManager from './components/UnavailableDaysManager';
 import UserAdminPanel from './components/UserAdminPanel';
 import SuperAdminDashboard from './dashboard/SuperAdminDashboard';
 import ClientDashboard from './dashboard/ClientDashboard';
+import ClientProfile from './components/ClientProfile'; 
+import ClientReservations from './components/ClientReservations';
 import BookingPage from './pages/BookingPage';
 import WelcomePage from './pages/WelcomePage';
 
@@ -85,7 +87,11 @@ function App() {
               <ClientDashboard />
             </ProtectedRoute>
           }
-        />
+          >
+          <Route path="profile" element={<ClientProfile />} />
+          <Route path="reservas" element={<ClientReservations />} />
+          
+        </Route>
 
 
         {/* Página de servicios */}
