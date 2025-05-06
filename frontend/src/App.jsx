@@ -14,6 +14,7 @@ import AvailabilityManager from './components/AvailabilityManager';
 import UnavailableDaysManager from './components/UnavailableDaysManager';
 import UserAdminPanel from './components/UserAdminPanel';
 import SuperAdminDashboard from './dashboard/SuperAdminDashboard';
+import ClientDashboard from './dashboard/ClientDashboard';
 import BookingPage from './pages/BookingPage';
 import WelcomePage from './pages/WelcomePage';
 
@@ -25,7 +26,12 @@ function App() {
         {/* Rutas públicas */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reservar" element={<BookingPage />} />
+        
+        <Route path="/reservar" element={
+          <ProtectedRoute role="cliente">
+            <BookingPage />
+          </ProtectedRoute>
+        }/>
 
         {/* Dashboard superadmin con rutas anidadas*/}
         <Route
@@ -70,6 +76,17 @@ function App() {
           <Route path="disponibilidad" element={<AvailabilityManager />} />
           <Route path="descansos" element={<UnavailableDaysManager />} />
         </Route>
+
+        {/* Dashboard cliente */}
+        <Route
+          path="/dashboard/client"
+          element={
+            <ProtectedRoute role="cliente">
+              <ClientDashboard />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* Página de servicios */}
         <Route

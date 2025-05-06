@@ -31,7 +31,15 @@ const WelcomePage = () => {
           <Link to="/dashboard/worker" style={{ marginRight: '1rem' }}>Mi panel Trabajador</Link>
         )}
 
+        {/* Si está autenticado y es cliente, muestro su dashboard */}
+        {isAuthenticated && user.role === 'cliente' && (
+        <Link to="/dashboard/client" style={{ marginRight: '1rem' }}>
+        Mis reservas
+        </Link>
+        )}
+
         <Link to="reservar" style={{ marginRight: '1rem' }}>Reservar</Link>
+
 
         {/* Si está autenticado, muestro botón para cerrar sesión
         {isAuthenticated && (

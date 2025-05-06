@@ -8,7 +8,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3000', // Cambia si el backend corre en otro puerto
         changeOrigin: true,
-        secure: false,
+        secure: false
       },
     },
   },

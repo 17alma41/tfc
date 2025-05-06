@@ -1,61 +1,50 @@
-const db = require('../config/db');
+
+const db    = require('../config/db');
 const dayjs = require('dayjs');
 
+/**
+ * Crea una reserva. Sólo clientes.
+ */
 exports.createReservation = (req, res) => {
   try {
-    const {
-      user_name,
-      user_email,
-      user_phone,
-      service_id,
-      worker_id,
-      date,
-      time,
-    } = req.body;
+    const { service_id, worker_id, date, time, user_phone } = req.body;
+    const userId = req.user.id; // de verifyToken
 
-    if (!user_name || !user_email || !user_phone || !service_id || !worker_id || !date || !time) {
+    // 1) Validar campos
+    if (!user_phone || !service_id || !worker_id || !date || !time) {
       return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
 
-    // Validar que el usuario no haya reservado en el pasado
-    const reservationDateTime = dayjs(`${date}T${time}`);
-    const now = dayjs();
+    // 2) Traer nombre y email reales del usuario
+    const user = db
+      .prepare('SELECT name, email FROM users WHERE id = ?')
+      .get(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
 
-    if (reservationDateTime.isBefore(now)) {
+    // 3) No en el pasado
+    const requested = dayjs(`${date}T${time}`);
+    if (requested.isBefore(dayjs())) {
       return res.status(400).json({ error: 'No puedes reservar en el pasado' });
     }
 
-    // Verificar que el servicio existe
-    const serviceExists = db.prepare(`SELECT id FROM services WHERE id = ?`).get(service_id);
-    if (!serviceExists) {
-      return res.status(400).json({ error: 'El servicio seleccionado no existe' });
-    }
-
-    // Verificar que el trabajador existe y tiene el rol correcto
-    const workerExists = db.prepare(`SELECT id FROM users WHERE id = ? AND role = 'trabajador'`).get(worker_id);
-    if (!workerExists) {
-      return res.status(400).json({ error: 'El trabajador seleccionado no existe o no es válido' });
-    }
-
-    // Verificar solapamiento 
-    const conflict = db.prepare(`
-      SELECT * FROM reservations
-      WHERE worker_id = ? AND date = ? AND time = ?
-    `).get(worker_id, date, time);
-
+    // 4) Comprobar hora libre
+    const conflict = db
+      .prepare(`SELECT 1 FROM reservations WHERE worker_id = ? AND date = ? AND time = ?`)
+      .get(worker_id, date, time);
     if (conflict) {
       return res.status(409).json({ error: 'Esa hora ya está reservada' });
     }
 
-    const stmt = db.prepare(`
+    // 5) Insertar sin user_id (no existe columna), pero con user_name/email
+    const info = db.prepare(`
       INSERT INTO reservations
-      (user_name, user_email, user_phone, service_id, worker_id, date, time)
+        (user_name, user_email, user_phone, service_id, worker_id, date, time)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const result = stmt.run(
-      user_name,
-      user_email,
+    `).run(
+      user.name,
+      user.email,
       user_phone,
       service_id,
       worker_id,
@@ -63,65 +52,105 @@ exports.createReservation = (req, res) => {
       time
     );
 
-    res.status(201).json({ id: result.lastInsertRowid });
+    return res.status(201).json({ id: info.lastInsertRowid });
   } catch (err) {
-    res.status(500).json({ error: 'Error al crear reserva', details: err.message });
+    console.error('Error al crear reserva:', err);
+    return res.status(500).json({ error: 'Error al crear reserva', details: err.message });
   }
 };
 
+/**
+ * Devuelve las reservas del trabajador logueado.
+ */
 exports.getReservationsByWorker = (req, res) => {
   const worker_id = req.user.id;
+  if (req.user.role !== 'trabajador') {
+    return res.status(403).json({ error: 'Sólo trabajadores pueden ver esto' });
+  }
 
   try {
-    const stmt = db.prepare(`
-      SELECT * FROM reservations
-      WHERE worker_id = ?
-      ORDER BY date, time
-    `);
+    const rows = db.prepare(`
+      SELECT
+        r.id,
+        r.date,
+        r.time,
+        r.status,
+        r.user_name,
+        s.title AS service_title
+      FROM reservations r
+      JOIN services s ON r.service_id = s.id
+      WHERE r.worker_id = ?
+      ORDER BY r.date, r.time
+    `).all(worker_id);
 
-    const reservations = stmt.all(worker_id);
-    res.json(reservations);
+    res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: 'Error al obtener reservas' });
+    console.error('❌ Error al obtener reservas del trabajador:', err);
+    res.status(500).json({ error: 'Error al obtener reservas del trabajador' });
   }
 };
 
-// Genera los slots disponibles para un trabajador
+/**
+ * Devuelve las reservas del cliente logueado.
+ */
+exports.getReservationsByClient = (req, res) => {
+  try {
+    const userId = req.user.id;
+    // volver a leer email
+    const user = db
+      .prepare('SELECT email FROM users WHERE id = ?')
+      .get(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // traer las reservas de ese email
+    const rows = db.prepare(`
+      SELECT
+        r.id,
+        r.date,
+        r.time,
+        s.title AS service_title,
+        u.name  AS worker_name
+      FROM reservations r
+      JOIN services  s ON r.service_id = s.id
+      JOIN users     u ON r.worker_id   = u.id
+      WHERE r.user_email = ?
+      ORDER BY r.date, r.time
+    `).all(user.email);
+
+    return res.json(rows);
+  } catch (err) {
+    console.error('Error al obtener historial del cliente:', err);
+    return res.status(500).json({ error: 'Error interno al obtener tus reservas' });
+  }
+};
+
+/**
+ * Helper interno: calcula slots libres en base a disponibilidad y reservas.
+ */
 function getAvailableSlots(worker_id, date, service_duration) {
   const unavailable = db.prepare(`
-    SELECT * FROM worker_unavailable_days WHERE worker_id = ? AND date = ?
+    SELECT * FROM worker_unavailable_days
+    WHERE worker_id = ? AND date = ?
   `).get(worker_id, date);
-
-  if (unavailable){
-    console.log(`⛔ Trabajador ${worker_id} no está disponible el día ${date}`);
-    return [];
-  } 
+  if (unavailable) return [];
 
   const dayOfWeek = dayjs(date).format('dddd').toLowerCase();
-
-  const availability = db.prepare(`
+  const avail = db.prepare(`
     SELECT start_time, end_time FROM worker_availability
     WHERE worker_id = ? AND day_of_week = ?
   `).get(worker_id, dayOfWeek);
+  if (!avail) return [];
 
-  if (!availability) return [];
-
-  const { start_time, end_time } = availability;
-
-  const toMinutes = (time) => {
-    const [h, m] = time.split(':').map(Number);
-    return h * 60 + m;
+  const toMin = t => { const [h,m]=t.split(':').map(Number); return h*60+m };
+  const toHHMM = m => {
+    const h = Math.floor(m/60).toString().padStart(2,'0');
+    const mm= (m%60).toString().padStart(2,'0');
+    return `${h}:${mm}`;
   };
 
-  const fromMinutes = (mins) => {
-    const h = Math.floor(mins / 60).toString().padStart(2, '0');
-    const m = (mins % 60).toString().padStart(2, '0');
-    return `${h}:${m}`;
-  };
-
-  const start = toMinutes(start_time);
-  const end = toMinutes(end_time);
-
+  const start = toMin(avail.start_time), end = toMin(avail.end_time);
   const booked = db.prepare(`
     SELECT time FROM reservations
     WHERE worker_id = ? AND date = ?
@@ -129,28 +158,24 @@ function getAvailableSlots(worker_id, date, service_duration) {
 
   const slots = [];
   for (let t = start; t + service_duration <= end; t += service_duration) {
-    const slot = fromMinutes(t);
-    if (!booked.includes(slot)) {
-      slots.push(slot);
-    }
+    const slot = toHHMM(t);
+    if (!booked.includes(slot)) slots.push(slot);
   }
-
   return slots;
 }
 
-
+/**
+ * Devuelve los slots disponibles para un trabajador dado.
+ */
 exports.getWorkerAvailability = (req, res) => {
   const { worker_id, date, service_duration } = req.query;
-
   if (!worker_id || !date || !service_duration) {
     return res.status(400).json({ error: 'Parámetros faltantes' });
   }
-
   const slots = getAvailableSlots(
-    parseInt(worker_id),
+    parseInt(worker_id, 10),
     date,
-    parseInt(service_duration)
+    parseInt(service_duration, 10)
   );
-
   res.json(slots);
 };

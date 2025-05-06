@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { getServices } from '../services/serviceService';
 import { getPublicWorkers } from '../services/userService';
-import { getAvailableSlots, createReservation } from '../services/bookingService';
+import {
+  getAvailableSlots,
+  createReservation,
+  getClientReservations
+} from '../services/bookingService';
 import dayjs from 'dayjs';
 
 const BookingPage = () => {
+  const { user } = useAuth();
+
   const [workers, setWorkers] = useState([]);
   const [services, setServices] = useState([]);
   const [selectedWorker, setSelectedWorker] = useState('');
@@ -12,92 +19,124 @@ const BookingPage = () => {
   const [date, setDate] = useState('');
   const [slots, setSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState('');
-  const [clientInfo, setClientInfo] = useState({ name: '', email: '', phone: '' });
+  const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
+  const [clientReservations, setClientReservations] = useState([]);
+
+  const minDate = dayjs().format('YYYY-MM-DD');
 
   useEffect(() => {
     getPublicWorkers()
-    .then(res => setWorkers(res.data))
-    .catch(err => console.error('Error al cargar trabajadores públicos:', err));
-
-    getServices().then(res => setServices(res.data));
+      .then(res => setWorkers(res.data))
+      .catch(err => console.error('Error al cargar trabajadores públicos:', err));
+    getServices()
+      .then(res => setServices(res.data))
+      .catch(err => console.error('Error al cargar servicios:', err));
   }, []);
 
   useEffect(() => {
     if (selectedWorker && date && selectedService) {
-      const service = services.find(s => s.id === +selectedService);
-      if (!service?.duration) {
-        console.error('Servicio sin duración definida:', service);
-        return;
+      const svc = services.find(s => s.id === +selectedService);
+      if (svc) {
+        getAvailableSlots(selectedWorker, date, svc.duration)
+          .then(res => setSlots(res.data))
+          .catch(err => console.error('Error al obtener slots:', err));
       }
-      getAvailableSlots(selectedWorker, date, service.duration)
-        .then(res => setSlots(res.data))
-        .catch(err => console.error('Error slots:', err));
     } else {
-      setSlots([]); // limpia si cambia worker/fecha/servicio
+      setSlots([]);
     }
-  }, [selectedWorker, date, selectedService]);
-  
+  }, [selectedWorker, date, selectedService, services]);
+
+  useEffect(() => {
+    if (user?.role === 'cliente') {
+      getClientReservations()
+        .then(res => setClientReservations(res.data))
+        .catch(err => {
+          console.error('Error al cargar tus reservas:', err);
+          setClientReservations([]);
+        });
+    }
+  }, [user]);
 
   const handleReservation = async () => {
     try {
-      const service = services.find(s => s.id === parseInt(selectedService));
       await createReservation({
-        user_name: clientInfo.name,
-        user_email: clientInfo.email,
-        user_phone: clientInfo.phone,
+        user_name:  user.name,
+        user_email: user.email,
+        user_phone: phone,
         service_id: selectedService,
         worker_id: selectedWorker,
         date,
         time: selectedTime
       });
       setMessage('Reserva confirmada 🎉');
+
+      // resfrescar “mis reservas”
+      if (user?.role === 'cliente') {
+        const res = await getClientReservations();
+        setClientReservations(res.data);
+      }
     } catch (err) {
+      console.error(err);
       setMessage(err.response?.data?.error || 'Error al crear reserva');
     }
   };
 
-  const minDate = dayjs().format('YYYY-MM-DD');
-
   return (
     <div>
       <h2>Reservar una cita</h2>
-
       {message && <p>{message}</p>}
 
-      <select onChange={(e) => setSelectedWorker(e.target.value)} value={selectedWorker}>
-        <option value="">Selecciona un trabajador</option>
-        {workers.map(w => (
-          <option key={w.id} value={w.id}>{w.name}</option>
-        ))}
-      </select>
+      <div style={{ marginBottom: '1rem' }}>
+        <label>
+          Trabajador:
+          <select
+            value={selectedWorker}
+            onChange={e => setSelectedWorker(e.target.value)}
+          >
+            <option value="">-- elige uno --</option>
+            {workers.map(w => (
+              <option key={w.id} value={w.id}>{w.name}</option>
+            ))}
+          </select>
+        </label>
 
-      <select onChange={(e) => setSelectedService(e.target.value)} value={selectedService}>
-        <option value="">Selecciona un servicio</option>
-        {services.map(s => (
-          <option key={s.id} value={s.id}>
-            {s.title} - €{s.price} - {s.duration} min
-          </option>
-        ))}
-      </select>
+        <label style={{ marginLeft: '1rem' }}>
+          Servicio:
+          <select
+            value={selectedService}
+            onChange={e => setSelectedService(e.target.value)}
+          >
+            <option value="">-- elige uno --</option>
+            {services.map(s => (
+              <option key={s.id} value={s.id}>
+                {s.title} — €{s.price} — {s.duration} min
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <input
-        type="date"
-        min={minDate}
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-      />
+        <label style={{ marginLeft: '1rem' }}>
+          Fecha:
+          <input
+            type="date"
+            min={minDate}
+            value={date}
+            onChange={e => setDate(e.target.value)}
+          />
+        </label>
+      </div>
 
       {slots.length > 0 ? (
         <div>
-          <h4>Horarios disponibles:</h4>
-          {slots.map((slot) => (
+          <h4>Horarios disponibles</h4>
+          {slots.map(slot => (
             <button
               key={slot}
               onClick={() => setSelectedTime(slot)}
               style={{
                 margin: '0.25rem',
-                background: selectedTime === slot ? 'lightblue' : ''
+                background: selectedTime === slot ? 'lightblue' : undefined
               }}
             >
               {slot}
@@ -105,18 +144,26 @@ const BookingPage = () => {
           ))}
         </div>
       ) : (
-        (selectedWorker && date && selectedService)
-          ? <p>No hay horas disponibles.</p>
-          : null
+        selectedWorker && date && selectedService && (
+          <p>No hay horas disponibles para esa combinación.</p>
+        )
       )}
 
+      <hr/>
 
-      <h4>Tus datos</h4>
-      <input placeholder="Nombre" onChange={e => setClientInfo({ ...clientInfo, name: e.target.value })} />
-      <input placeholder="Correo" onChange={e => setClientInfo({ ...clientInfo, email: e.target.value })} />
-      <input placeholder="Teléfono" onChange={e => setClientInfo({ ...clientInfo, phone: e.target.value })} />
-
-      <button onClick={handleReservation} disabled={!selectedTime}>Reservar</button>
+      <h3>Tus datos</h3>
+      <input type="text" value={user?.name || ''} readOnly style={{ marginRight: '0.5rem' }} />
+      <input type="email" value={user?.email || ''} readOnly style={{ marginRight: '0.5rem' }} />
+      <input
+        type="tel"
+        placeholder="Tu teléfono"
+        value={phone}
+        onChange={e => setPhone(e.target.value)}
+        style={{ marginRight: '0.5rem' }}
+      />
+      <button onClick={handleReservation} disabled={!selectedTime || !phone}>
+        Reservar
+      </button>
     </div>
   );
 };
