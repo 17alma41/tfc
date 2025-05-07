@@ -1,19 +1,31 @@
-
-const db    = require('../config/db');
+const db = require('../config/db');
 const dayjs = require('dayjs');
+const { check, query, validationResult } = require('express-validator');
 
 /**
  * Crea una reserva. Sólo clientes.
  */
-exports.createReservation = (req, res) => {
+exports.createReservation = async (req, res) => {
+  // 1) Validar campos de entrada
+  await check('service_id', 'service_id debe ser un entero')
+    .isInt().run(req);
+  await check('worker_id', 'worker_id debe ser un entero')
+    .isInt().run(req);
+  await check('date', 'Date debe tener formato YYYY-MM-DD')
+    .isISO8601().run(req);
+  await check('time', 'Time debe tener formato HH:MM')
+    .matches(/^\d{2}:\d{2}$/).run(req);
+  await check('user_phone', 'El teléfono del usuario es obligatorio')
+    .notEmpty().run(req);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { service_id, worker_id, date, time, user_phone } = req.body;
     const userId = req.user.id; // de verifyToken
-
-    // 1) Validar campos
-    if (!user_phone || !service_id || !worker_id || !date || !time) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
-    }
 
     // 2) Traer nombre y email reales del usuario
     const user = db
@@ -31,31 +43,37 @@ exports.createReservation = (req, res) => {
 
     // 4) Comprobar hora libre
     const conflict = db
-      .prepare(`SELECT 1 FROM reservations WHERE worker_id = ? AND date = ? AND time = ?`)
+      .prepare(
+        `SELECT 1 FROM reservations WHERE worker_id = ? AND date = ? AND time = ?`
+      )
       .get(worker_id, date, time);
     if (conflict) {
       return res.status(409).json({ error: 'Esa hora ya está reservada' });
     }
 
-    // 5) Insertar sin user_id (no existe columna), pero con user_name/email
-    const info = db.prepare(`
-      INSERT INTO reservations
-        (user_name, user_email, user_phone, service_id, worker_id, date, time)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      user.name,
-      user.email,
-      user_phone,
-      service_id,
-      worker_id,
-      date,
-      time
-    );
+    // 5) Insertar con user_name y user_email
+    const info = db
+      .prepare(`
+        INSERT INTO reservations
+          (user_name, user_email, user_phone, service_id, worker_id, date, time)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `)
+      .run(
+        user.name,
+        user.email,
+        user_phone,
+        service_id,
+        worker_id,
+        date,
+        time
+      );
 
     return res.status(201).json({ id: info.lastInsertRowid });
   } catch (err) {
     console.error('Error al crear reserva:', err);
-    return res.status(500).json({ error: 'Error al crear reserva', details: err.message });
+    return res
+      .status(500)
+      .json({ error: 'Error al crear reserva', details: err.message });
   }
 };
 
@@ -69,24 +87,28 @@ exports.getReservationsByWorker = (req, res) => {
   }
 
   try {
-    const rows = db.prepare(`
-      SELECT
-        r.id,
-        r.date,
-        r.time,
-        r.status,
-        r.user_name,
-        s.title AS service_title
-      FROM reservations r
-      JOIN services s ON r.service_id = s.id
-      WHERE r.worker_id = ?
-      ORDER BY r.date, r.time
-    `).all(worker_id);
+    const rows = db
+      .prepare(`
+        SELECT
+          r.id,
+          r.date,
+          r.time,
+          r.status,
+          r.user_name,
+          s.title AS service_title
+        FROM reservations r
+        JOIN services s ON r.service_id = s.id
+        WHERE r.worker_id = ?
+        ORDER BY r.date, r.time
+      `)
+      .all(worker_id);
 
-    res.json(rows);
+    return res.json(rows);
   } catch (err) {
     console.error('❌ Error al obtener reservas del trabajador:', err);
-    res.status(500).json({ error: 'Error al obtener reservas del trabajador' });
+    return res
+      .status(500)
+      .json({ error: 'Error al obtener reservas del trabajador' });
   }
 };
 
@@ -105,24 +127,28 @@ exports.getReservationsByClient = (req, res) => {
     }
 
     // traer las reservas de ese email
-    const rows = db.prepare(`
-      SELECT
-        r.id,
-        r.date,
-        r.time,
-        s.title AS service_title,
-        u.name  AS worker_name
-      FROM reservations r
-      JOIN services  s ON r.service_id = s.id
-      JOIN users     u ON r.worker_id   = u.id
-      WHERE r.user_email = ?
-      ORDER BY r.date, r.time
-    `).all(user.email);
+    const rows = db
+      .prepare(`
+        SELECT
+          r.id,
+          r.date,
+          r.time,
+          s.title AS service_title,
+          u.name  AS worker_name
+        FROM reservations r
+        JOIN services  s ON r.service_id = s.id
+        JOIN users     u ON r.worker_id   = u.id
+        WHERE r.user_email = ?
+        ORDER BY r.date, r.time
+      `)
+      .all(user.email);
 
     return res.json(rows);
   } catch (err) {
     console.error('Error al obtener historial del cliente:', err);
-    return res.status(500).json({ error: 'Error interno al obtener tus reservas' });
+    return res
+      .status(500)
+      .json({ error: 'Error interno al obtener tus reservas' });
   }
 };
 
@@ -130,31 +156,39 @@ exports.getReservationsByClient = (req, res) => {
  * Helper interno: calcula slots libres en base a disponibilidad y reservas.
  */
 function getAvailableSlots(worker_id, date, service_duration) {
-  const unavailable = db.prepare(`
-    SELECT * FROM worker_unavailable_days
-    WHERE worker_id = ? AND date = ?
-  `).get(worker_id, date);
+  const unavailable = db
+    .prepare(`
+      SELECT * FROM worker_unavailable_days
+      WHERE worker_id = ? AND date = ?
+    `)
+    .get(worker_id, date);
   if (unavailable) return [];
 
   const dayOfWeek = dayjs(date).format('dddd').toLowerCase();
-  const avail = db.prepare(`
-    SELECT start_time, end_time FROM worker_availability
-    WHERE worker_id = ? AND day_of_week = ?
-  `).get(worker_id, dayOfWeek);
+  const avail = db
+    .prepare(`
+      SELECT start_time, end_time FROM worker_availability
+      WHERE worker_id = ? AND day_of_week = ?
+    `)
+    .get(worker_id, dayOfWeek);
   if (!avail) return [];
 
-  const toMin = t => { const [h,m]=t.split(':').map(Number); return h*60+m };
+  const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m };
   const toHHMM = m => {
-    const h = Math.floor(m/60).toString().padStart(2,'0');
-    const mm= (m%60).toString().padStart(2,'0');
+    const h = Math.floor(m / 60).toString().padStart(2, '0');
+    const mm = (m % 60).toString().padStart(2, '0');
     return `${h}:${mm}`;
   };
 
-  const start = toMin(avail.start_time), end = toMin(avail.end_time);
-  const booked = db.prepare(`
-    SELECT time FROM reservations
-    WHERE worker_id = ? AND date = ?
-  `).all(worker_id, date).map(r => r.time);
+  const start = toMin(avail.start_time);
+  const end = toMin(avail.end_time);
+  const booked = db
+    .prepare(`
+      SELECT time FROM reservations
+      WHERE worker_id = ? AND date = ?
+    `)
+    .all(worker_id, date)
+    .map(r => r.time);
 
   const slots = [];
   for (let t = start; t + service_duration <= end; t += service_duration) {
@@ -167,15 +201,22 @@ function getAvailableSlots(worker_id, date, service_duration) {
 /**
  * Devuelve los slots disponibles para un trabajador dado.
  */
-exports.getWorkerAvailability = (req, res) => {
-  const { worker_id, date, service_duration } = req.query;
-  if (!worker_id || !date || !service_duration) {
-    return res.status(400).json({ error: 'Parámetros faltantes' });
+exports.getWorkerAvailability = async (req, res) => {
+  // Validar query params
+  await query('worker_id', 'worker_id debe ser un entero').isInt().run(req);
+  await query('date', 'Date debe tener formato YYYY-MM-DD').isISO8601().run(req);
+  await query('service_duration', 'service_duration debe ser un entero').isInt().run(req);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
+
+  const { worker_id, date, service_duration } = req.query;
   const slots = getAvailableSlots(
     parseInt(worker_id, 10),
     date,
     parseInt(service_duration, 10)
   );
-  res.json(slots);
+  return res.json(slots);
 };

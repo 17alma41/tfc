@@ -9,10 +9,11 @@ const WelcomePage = () => {
       <h1>Bienvenido a la aplicación</h1>
       <nav style={{ marginBottom: '1rem' }}>
 
-        {/* Si NO está autenticado, se muestra Login */}
+        {/* Si NO está autenticado, se muestra Login y Register */}
         {!isAuthenticated && (
           <>
             <Link to="login" style={{ marginRight: '1rem' }}>Login</Link>
+            <Link to="register" style={{ marginRight: '1rem' }}>Register</Link>
           </>
         )}
 
@@ -37,8 +38,13 @@ const WelcomePage = () => {
           Mi panel
         </Link>
         )}
-
-        <Link to="reservar" style={{ marginRight: '1rem' }}>Reservar</Link>
+      
+        {isAuthenticated && user.role === 'cliente' && (
+          <Link to="reservar" style={{ marginRight: '1rem' }}>
+            Reservar
+          </Link>
+        )}   
+      
 
 
         {/* Si está autenticado, muestro botón para cerrar sesión

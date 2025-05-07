@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
@@ -22,7 +22,6 @@ import WelcomePage from './pages/WelcomePage';
 
 function App() {
   return (
-    <Router>
       <Routes>
 
         {/* Rutas públicas */}
@@ -112,6 +111,7 @@ function App() {
           } 
         > 
           <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
           <Route path="/dashboard/superadmin" element={<SuperAdminDashboard />} />
           <Route path="/dashboard/admin" element={<AdminDashboard />} />
           <Route path="/dashboard/worker" element={<WorkerDashboard />} />
@@ -123,7 +123,6 @@ function App() {
         <Route path="/unauthorized" element={<Unauthorized />} />
 
       </Routes>
-    </Router>
   );
 }
 

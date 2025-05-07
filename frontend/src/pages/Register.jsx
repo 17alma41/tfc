@@ -1,76 +1,76 @@
-import { useState } from 'react';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useAuth } from '../context/AuthContext';
 import { register } from '../services/authService';
+import { registerSchema } from '../validationSchemas';
 
 export default function Register() {
-  const { user } = useAuth(); // ← dentro del componente
-  const [form, setForm] = useState({
-    name:     '',
-    email:    '',
-    password: '',
-    role:     'cliente'      // o el rol por defecto que quieras
-  });
+  const { user } = useAuth();
+  const initialValues = { name:'', email:'', password:'', role:'cliente' };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values, { setSubmitting, setStatus }) => {
     try {
-      await register(form);
-      alert('Registro exitoso');
+      await register(values);
+      setStatus({ success:'Usuario registrado correctamente' });
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al registrar usuario');
+      setStatus({ error: err.response?.data?.error || 'Error al registrar' });
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
       <h2>Registro</h2>
-      <input
-        type="text"
-        name="name"
-        placeholder="Nombre"
-        value={form.name}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="email"
-        name="email"
-        placeholder="Correo"
-        value={form.email}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Contraseña"
-        value={form.password}
-        onChange={handleChange}
-        required
-      />
+      <Formik
+        initialValues={initialValues}
+        validationSchema={registerSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, status }) => (
+          <Form>
+            <div>
+              <label htmlFor="name">Nombre</label>
+              <Field name="name" className="form-control" />
+              <ErrorMessage name="name" component="div" className="text-red-600 text-sm"/>
+            </div>
 
-      {(
-        process.env.NODE_ENV === 'development' ||
-        user?.role === 'superadmin'
-      ) && (
-        <select
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-        >
-          <option value="cliente">Cliente</option>
-          <option value="trabajador">Trabajador</option>
-          <option value="encargado">Encargado</option>
-          <option value="admin">Administrador</option>
-          <option value="superadmin">Superadmin</option>
-        </select>
-      )}
+            <div>
+              <label htmlFor="email">Email</label>
+              <Field name="email" type="email" className="form-control"/>
+              <ErrorMessage name="email" component="div" className="text-red-600 text-sm"/>
+            </div>
 
-      <button type="submit">Registrar</button>
-    </form>
+            <div>
+              <label htmlFor="password">Contraseña</label>
+              <Field name="password" type="password" className="form-control"/>
+              <ErrorMessage name="password" component="div" className="text-red-600 text-sm"/>
+            </div>
+
+            <div>
+              <label htmlFor="role">Rol</label>
+              <Field name="role" as="select" className="form-control">
+                <option value="cliente">Cliente</option>
+                <option value="trabajador">Trabajador</option>
+                <option value="encargado">Encargado</option>
+                <option value="admin">Administrador</option>
+                <option value="superadmin">Superadmin</option>
+              </Field>
+              <ErrorMessage name="role" component="div" className="text-red-600 text-sm"/>
+            </div>
+
+            {status?.error   && <div className="text-red-600">{status.error}</div>}
+            {status?.success && <div className="text-green-600">{status.success}</div>}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn btn-primary"
+            >
+              {isSubmitting ? 'Registrando…' : 'Registrar'}
+            </button>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 }

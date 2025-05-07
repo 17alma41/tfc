@@ -1,6 +1,6 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
-import { login, logout, getProfile } from "../services/authService";
+import { login as loginService, logout as logoutService, getProfile as getProfileService } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -8,11 +8,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => { // Verificamos si el usuario está autenticado
     const checkAuth = async () => {
       try {
-        const { data } = await getProfile(); 
+        const {data} = await getProfileService();
         setUser(data); 
         setIsAuthenticated(true);
       } catch (err) {
@@ -26,25 +27,36 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const loginUser = async (credentials) => {
+  const loginUser = async (values, { setStatus, setSubmitting }) => {
     try {
-      await login(credentials);
-      const { data } = await getProfile();
+      await loginService(values);
+
+      const { data } = await getProfileService();
       setUser(data);
       setIsAuthenticated(true);
-    } catch (error) {
-      throw new Error("Credenciales inválidas");
+
+      navigate(`/`);
+    } catch (err) {
+      setStatus({ error: err.message });
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const logoutUser = async () => { 
-    await logout();
-    setUser(null);
-    setIsAuthenticated(false);
+  const logoutUser = async () => {
+    try {
+      await logoutService(); 
+    } catch (err) {
+      console.error("Error en logout:", err);
+    } finally {
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate("/"); 
+    }
   };
 
   return ( 
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login: loginUser, logout: logoutUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, loginUser, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );

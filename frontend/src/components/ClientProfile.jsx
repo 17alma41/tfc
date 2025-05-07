@@ -1,8 +1,7 @@
-// src/components/ClientProfile.jsx
 import { useAuth } from '../context/AuthContext';
 
 const ClientProfile = () => {
-  const { user, logout } = useAuth();
+  const { user, logoutUser } = useAuth();
 
   return (
     <div>
@@ -13,7 +12,7 @@ const ClientProfile = () => {
 
       {/* Botón de cerrar sesión */}
       <button
-        onClick={logout}
+        onClick={logoutUser}
         style={{
           marginTop: '1rem',
           padding: '0.5rem 1rem',

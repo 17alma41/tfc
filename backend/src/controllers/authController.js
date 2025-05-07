@@ -1,25 +1,47 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { check, validationResult } = require('express-validator');
 
 const createToken = (user) => {
-  return jwt.sign({ id: user.id, role: user.role, name: user.name }, process.env.JWT_SECRET, { expiresIn: '1d' });
+  return jwt.sign(
+    { id: user.id, role: user.role, name: user.name },
+    process.env.JWT_SECRET,
+    { expiresIn: '1d' }
+  );
 };
 
-exports.register = (req, res) => {
+// Validaciones para registro
+exports.register = async (req, res) => {
+  await check('name', 'El nombre es obligatorio').notEmpty().run(req);
+  await check('email', 'Debe ser un email válido').isEmail().run(req);
+  await check('password', 'La contraseña debe tener al menos 6 caracteres')
+    .isLength({ min: 6 })
+    .run(req);
+
+  if (req.body.role) {
+    await check('role', 'Rol inválido')
+      .isIn(['admin', 'encargado', 'trabajador', 'cliente', 'superadmin'])
+      .run(req);
+  }
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { name, email, password, role } = req.body;
   let assignedRole = 'cliente';
 
-  // Si piden superadmin, solo en dev y con secret
   if (role === 'superadmin') {
     if (process.env.NODE_ENV === 'development') {
       assignedRole = 'superadmin';
     } else {
       return res.status(403).json({ error: 'No autorizado para crear superadmin en producción' });
     }
-    } else if (['admin','encargado','trabajador','cliente'].includes(role)) {
-      assignedRole = role;
-    }
+  } else if (['admin','encargado','trabajador','cliente'].includes(role)) {
+    assignedRole = role;
+  }
 
   const hashed = bcrypt.hashSync(password, 10);
   try {
@@ -36,9 +58,17 @@ exports.register = (req, res) => {
   }
 };
 
-exports.login = (req, res) => {
-  const { email, password } = req.body;
+// Validaciones para login
+exports.login = async (req, res) => {
+  await check('email', 'Debe ser un email válido').isEmail().run(req);
+  await check('password', 'La contraseña es obligatoria').notEmpty().run(req);
 
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email, password } = req.body;
   const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
   if (!user) return res.status(401).json({ error: 'Usuario no encontrado' });
 
@@ -67,14 +97,14 @@ exports.getProfile = (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = db.prepare(`SELECT id, name, email, role FROM users WHERE id = ?`).get(decoded.id);
+    const user = db
+      .prepare(`SELECT id, name, email, role FROM users WHERE id = ?`)
+      .get(decoded.id);
 
     if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
-    res.json(user); // devolvemos solo los campos necesarios
+    res.json(user);
   } catch (err) {
     res.status(401).json({ error: 'Token inválido' });
   }
-};  
-
-
+};
