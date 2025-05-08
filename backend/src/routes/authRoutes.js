@@ -1,8 +1,12 @@
 const express = require('express');
 const db = require('../config/db');
 const router = express.Router();
-const { register, login, logout, getProfile } = require('../controllers/authController');
+const jwt = require('jsonwebtoken');  
+const { forgotPassword, resetPassword, register, login, logout, getProfile } = require('../controllers/authController');
 const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
+const passport = require('passport')
+const { roleToPath } = require('../config/roleMap');;
+
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', logout);
@@ -37,5 +41,31 @@ router.get('/users/workers', verifyToken, requireRole(['admin']), (req, res) => 
     res.status(500).json({ error: 'Error al obtener trabajadores' });
   }
 });
+
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
+
+// Inicia flujo OAuth
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+// Callback de Google
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login', session: false }),
+  (req, res) => {
+    // Genera tu JWT
+    const token = jwt.sign(
+      { id: req.user.id, role: req.user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    // Manda cookie y redirige al front
+    res.cookie('token', token, { httpOnly: true, sameSite: 'Lax' });
+
+    //const frontendRole = roleToPath[req.user.role] || req.user.role; 
+    res.redirect(`${process.env.FRONTEND_URL}/`);
+  }
+);
 
 module.exports = router;

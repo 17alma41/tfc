@@ -1,7 +1,8 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useAuth } from '../context/AuthContext';
-import { login } from '../services/authService';
+import { Link } from 'react-router-dom'; 
 import { loginSchema } from '../validationSchemas';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function Login() {
   const { loginUser } = useAuth();
@@ -40,6 +41,22 @@ export default function Login() {
             >
               {isSubmitting ? 'Entrando…' : 'Entrar'}
             </button>
+
+            <div style={{ marginTop: '1rem' }}>
+              <Link to="/forgot-password" className="text-blue-600 hover:underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
+            <div style={{ marginTop: '1rem' }}>
+              <a
+                href="http://localhost:3000/api/auth/google"
+                className="btn btn-outline-secondary flex items-center"
+              >
+                <FcGoogle className="mr-2"/> Entrar con Google
+              </a>
+            </div>
+
           </Form>
         )}
       </Formik>

@@ -12,6 +12,12 @@ db.prepare(`
   )
 `).run();
 
+// Añadir columna google_id si no existe (para OAuth con Google)
+const tableInfo = db.prepare(`PRAGMA table_info(users)`).all();
+if (!tableInfo.some(col => col.name === 'google_id')) {
+  db.prepare(`ALTER TABLE users ADD COLUMN google_id TEXT`).run();
+}
+
 // Crear tabla servicios si no existe
 db.prepare(`
   CREATE TABLE IF NOT EXISTS services (
@@ -37,7 +43,6 @@ db.prepare(`
     date         TEXT    NOT NULL,
     time         TEXT    NOT NULL,
     created_at   TEXT    DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id)    REFERENCES users(id),
     FOREIGN KEY (service_id) REFERENCES services(id),
     FOREIGN KEY (worker_id)  REFERENCES users(id)
   )
@@ -48,9 +53,9 @@ db.prepare(`
   CREATE TABLE IF NOT EXISTS worker_availability (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     worker_id INTEGER NOT NULL,
-    day_of_week TEXT NOT NULL, -- Ej: 'monday', 'tuesday'
-    start_time TEXT NOT NULL,  -- Ej: '09:00'
-    end_time TEXT NOT NULL,    -- Ej: '14:00'
+    day_of_week TEXT NOT NULL,
+    start_time TEXT NOT NULL,
+    end_time TEXT NOT NULL,
     FOREIGN KEY (worker_id) REFERENCES users(id)
   )
 `).run();
@@ -60,7 +65,7 @@ db.prepare(`
   CREATE TABLE IF NOT EXISTS worker_unavailable_days (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     worker_id INTEGER NOT NULL,
-    date TEXT NOT NULL, -- formato ISO: YYYY-MM-DD
+    date TEXT NOT NULL,
     reason TEXT,
     FOREIGN KEY (worker_id) REFERENCES users(id)
   )

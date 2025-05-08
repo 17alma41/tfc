@@ -1,7 +1,10 @@
 const express = require('express');
 require('dotenv').config({ path: __dirname + '/../.env' });
+require('./config/passport');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const passport = require('passport');
 
 const authRoutes = require('./routes/authRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
@@ -20,6 +23,19 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(
+  session({
+    secret: process.env.JWT_SECRET, 
+    resave: false, 
+    saveUninitialized: false, 
+    cookie: { secure: process.env.NODE_ENV === 'production' } // Cookies seguras solo en producción
+  })
+);
+
+// Inicializa Passport para manejar OAuth
+app.use(passport.initialize());
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);

@@ -1,10 +1,14 @@
 import { Routes, Route } from 'react-router-dom';
-import Register from './pages/Register';
+import WelcomePage from './pages/WelcomePage';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Unauthorized from './pages/Unauthorized';
+import BookingPage from './pages/BookingPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './dashboard/AdminDashboard';
 import WorkerDashboard from './dashboard/WorkerDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
 import ServiceManager from './components/ServiceManager';
 import WorkerProfile from './components/WorkerProfile';
 import AdminProfile from './components/AdminProfile';
@@ -17,17 +21,21 @@ import SuperAdminDashboard from './dashboard/SuperAdminDashboard';
 import ClientDashboard from './dashboard/ClientDashboard';
 import ClientProfile from './components/ClientProfile'; 
 import ClientReservations from './components/ClientReservations';
-import BookingPage from './pages/BookingPage';
-import WelcomePage from './pages/WelcomePage';
 
 function App() {
   return (
       <Routes>
 
-        {/* Rutas públicas */}
+        {/* Autenticación */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password"  element={<ResetPassword />} />
         
+        {/* Página no autorizada */}  
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+
         <Route path="/reservar" element={
           <ProtectedRoute role="cliente">
             <BookingPage />
@@ -118,9 +126,6 @@ function App() {
           <Route path="reservar" element={<MyReservations />} />
 
         </Route>/
-
-        {/* Página no autorizada */}  
-        <Route path="/unauthorized" element={<Unauthorized />} />
 
       </Routes>
   );

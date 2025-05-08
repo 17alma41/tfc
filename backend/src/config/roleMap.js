@@ -1,0 +1,15 @@
+// Este archivo mapea los roles del backend al frontend y viceversa.
+const roleToPath = {
+    superadmin: 'superadmin',
+    admin:      'admin',
+    encargado:  'admin',    
+    trabajador: 'worker',
+    cliente:    'client'
+  };
+  
+  const pathToRole = Object.fromEntries(
+    Object.entries(roleToPath).map(([backend, frontend]) => [frontend, backend])
+  );
+  
+  module.exports = { roleToPath, pathToRole };
+  
