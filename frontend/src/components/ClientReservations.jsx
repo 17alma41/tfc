@@ -1,17 +1,34 @@
 import { useEffect, useState } from 'react';
-import { getClientReservations } from '../services/bookingService';
+import { getClientReservations, cancelClientReservation } from '../services/bookingService';
 
 const ClientReservations = () => {
   const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
-    getClientReservations()
-      .then(res => setReservations(res.data))
-      .catch(err => {
-        console.error('Error al cargar tus reservas:', err);
-        setReservations([]);
-      });
+    fetchReservations();
   }, []);
+
+  const fetchReservations = async () => {
+    try {
+      const res = await getClientReservations();
+      setReservations(res.data);
+    } catch (err) {
+      console.error('Error al cargar tus reservas:', err);
+      setReservations([]);
+    }
+  };
+
+  const handleCancel = async (id) => {
+    if (!window.confirm('¿Seguro que quieres cancelar esta reserva?')) return;
+    try {
+      await cancelClientReservation(id);
+      setReservations(prev => prev.filter(r => r.id !== id));
+      alert('Reserva cancelada correctamente');
+    } catch (err) {
+      console.error('Error al cancelar la reserva:', err);
+      alert('No se pudo cancelar la reserva');
+    }
+  };
 
   return (
     <div>
@@ -21,8 +38,22 @@ const ClientReservations = () => {
       ) : (
         <ul>
           {reservations.map(r => (
-            <li key={r.id}>
+            <li key={r.id} style={{ marginBottom: '0.5rem' }}>
               {r.date} {r.time} — {r.service_title} con {r.worker_name}
+              <button
+                onClick={() => handleCancel(r.id)}
+                style={{
+                  marginLeft: '1rem',
+                  padding: '0.2rem 0.5rem',
+                  background: '#e53e3e',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancelar
+              </button>
             </li>
           ))}
         </ul>

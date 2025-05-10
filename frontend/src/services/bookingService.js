@@ -21,6 +21,11 @@ export const createReservation = (data) => {
   return api.post('/reservations', data);
 };
 
+// Cancela la reserva
+export const cancelClientReservation = (id) => {
+  return api.delete(`/reservations/${id}`);
+};
+
 // Obtiene las reservas del trabajador logueado
 export const getClientReservations = () =>
   api.get('/reservations/client');
