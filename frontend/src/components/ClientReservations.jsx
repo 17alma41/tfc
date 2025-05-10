@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { getClientReservations, cancelClientReservation } from '../services/bookingService';
+import dayjs from 'dayjs';
 
-const ClientReservations = () => {
+export default function ClientReservations() {
   const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
@@ -22,13 +23,17 @@ const ClientReservations = () => {
     if (!window.confirm('¿Seguro que quieres cancelar esta reserva?')) return;
     try {
       await cancelClientReservation(id);
-      setReservations(prev => prev.filter(r => r.id !== id));
+      setReservations(prev => prev.map(r =>
+        r.id === id ? { ...r, status: 'cancelled' } : r
+      ));
       alert('Reserva cancelada correctamente');
     } catch (err) {
       console.error('Error al cancelar la reserva:', err);
       alert('No se pudo cancelar la reserva');
     }
   };
+
+  const now = dayjs();
 
   return (
     <div>
@@ -37,29 +42,38 @@ const ClientReservations = () => {
         <p>No tienes reservas aún.</p>
       ) : (
         <ul>
-          {reservations.map(r => (
-            <li key={r.id} style={{ marginBottom: '0.5rem' }}>
-              {r.date} {r.time} — {r.service_title} con {r.worker_name}
-              <button
-                onClick={() => handleCancel(r.id)}
-                style={{
-                  marginLeft: '1rem',
-                  padding: '0.2rem 0.5rem',
-                  background: '#e53e3e',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancelar
-              </button>
-            </li>
-          ))}
+          {reservations.map(r => {
+            const isPast = now.isAfter(dayjs(`${r.date}T${r.time}`));
+            return (
+              <li key={r.id} style={{ marginBottom: '0.5rem' }}>
+                <strong>{r.date} {r.time}</strong> — {r.service_title} con {r.worker_name}
+                {' '}
+                {r.status === 'cancelled' && (
+                  <span style={{ color: '#e53e3e', marginLeft: '1rem' }}>
+                    (Cancelada)
+                  </span>
+                )}
+                {!isPast && r.status === 'active' && (
+                  <button
+                    onClick={() => handleCancel(r.id)}
+                    style={{
+                      marginLeft: '1rem',
+                      padding: '0.2rem 0.5rem',
+                      background: '#e53e3e',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
   );
-};
-
-export default ClientReservations;
+}

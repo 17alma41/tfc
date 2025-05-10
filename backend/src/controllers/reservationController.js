@@ -39,19 +39,26 @@ exports.createReservation = async (req, res) => {
     // Comprobar hora libre
     const conflict = db
       .prepare(
-        `SELECT 1 FROM reservations WHERE worker_id = ? AND date = ? AND time = ?`
+        `SELECT 1 FROM reservations WHERE worker_id = ? AND date = ? AND time = ? AND status = 'active'`
       )
       .get(worker_id, date, time);
     if (conflict) {
       return res.status(409).json({ error: 'Esa hora ya está reservada' });
     }
 
+    const service = db
+      .prepare('SELECT title FROM services WHERE id = ?')
+      .get(service_id);
+    if (!service) {
+      return res.status(404).json({ error: 'Servicio no encontrado' });
+    }
+
     // Insertar reserva
     const info = db
       .prepare(`
         INSERT INTO reservations
-          (user_name, user_email, user_phone, service_id, worker_id, date, time)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+          (user_name, user_email, user_phone, service_id, worker_id, date, time, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `)
       .run(
         user.name,
@@ -60,10 +67,10 @@ exports.createReservation = async (req, res) => {
         service_id,
         worker_id,
         date,
-        time
+        time,
+        'active'
       );
 
-     
     // Fetch emails: cliente y trabajador
     const worker = db
       .prepare(`SELECT name, email FROM users WHERE id = ?`)
@@ -127,8 +134,16 @@ exports.cancelReservation = async (req, res) => {
   try {
     const reservationId = Number(req.params.id);
     const userId        = req.user.id;
-    const userEmail     = req.user.email;
     const userRole      = req.user.role;
+
+    // Obtener el email real del usuario que hace la petición
+    const userRow = db
+      .prepare('SELECT email FROM users WHERE id = ?')
+      .get(userId);
+    if (!userRow) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    const userEmail = userRow.email;
 
     // Obtener reserva
     const reservation = db
@@ -145,14 +160,14 @@ exports.cancelReservation = async (req, res) => {
     }
 
     // Autorizar: cliente dueño o trabajador asignado
-    const isClient  = userRole === 'cliente'   && reservation.user_email === userEmail;
-    const isWorker  = userRole === 'trabajador' && reservation.worker_id === userId;
+    const isClient = userRole === 'cliente' && reservation.user_email === userEmail;
+    const isWorker = userRole === 'trabajador' && reservation.worker_id === userId;
     if (!isClient && !isWorker) {
       return res.status(403).json({ error: 'No autorizado para cancelar esta reserva' });
     }
 
-    // Borrar reserva
-    db.prepare(`DELETE FROM reservations WHERE id = ?`).run(reservationId);
+    // Borrar reserva (soft-delete)
+    db.prepare(`UPDATE reservations SET status = 'cancelled' WHERE id = ?`).run(reservationId);
 
     // Fetch datos para correos
     const client = {
@@ -202,7 +217,6 @@ exports.cancelReservation = async (req, res) => {
   }
 };
 
-
 /**
  * Devuelve las reservas del trabajador logueado.
  */
@@ -227,6 +241,7 @@ exports.getReservationsByWorker = (req, res) => {
          JOIN services s ON r.service_id = s.id
          WHERE r.worker_id = ?
            AND r.date >= ?
+           AND r.status = 'active'
          ORDER BY r.date, r.time`
       )
       .all(worker_id, cutoff);
@@ -247,9 +262,7 @@ exports.getReservationsByClient = (req, res) => {
   try {
     const userId = req.user.id;
     // volver a leer email
-    const user = db
-      .prepare('SELECT email FROM users WHERE id = ?')
-      .get(userId);
+    const user = db.prepare('SELECT email FROM users WHERE id = ?').get(userId);
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
@@ -261,6 +274,7 @@ exports.getReservationsByClient = (req, res) => {
           r.id,
           r.date,
           r.time,
+          r.status,
           s.title AS service_title,
           u.name  AS worker_name
         FROM reservations r
@@ -285,23 +299,27 @@ exports.getReservationsByClient = (req, res) => {
  */
 function getAvailableSlots(worker_id, date, service_duration) {
   const unavailable = db
-    .prepare(`
-      SELECT * FROM worker_unavailable_days
-      WHERE worker_id = ? AND date = ?
-    `)
+    .prepare(
+      `
+        SELECT * FROM worker_unavailable_days
+        WHERE worker_id = ? AND date = ?
+      `
+    )
     .get(worker_id, date);
   if (unavailable) return [];
 
   const dayOfWeek = dayjs(date).format('dddd').toLowerCase();
   const avail = db
-    .prepare(`
-      SELECT start_time, end_time FROM worker_availability
-      WHERE worker_id = ? AND day_of_week = ?
-    `)
+    .prepare(
+      `
+        SELECT start_time, end_time FROM worker_availability
+        WHERE worker_id = ? AND day_of_week = ?
+      `
+    )
     .get(worker_id, dayOfWeek);
   if (!avail) return [];
 
-  const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m };
+  const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
   const toHHMM = m => {
     const h = Math.floor(m / 60).toString().padStart(2, '0');
     const mm = (m % 60).toString().padStart(2, '0');
@@ -311,10 +329,11 @@ function getAvailableSlots(worker_id, date, service_duration) {
   const start = toMin(avail.start_time);
   const end = toMin(avail.end_time);
   const booked = db
-    .prepare(`
-      SELECT time FROM reservations
-      WHERE worker_id = ? AND date = ?
-    `)
+    .prepare(
+      `SELECT time FROM reservations
+       WHERE worker_id = ? AND date = ? AND status = 'active'
+      `
+    )
     .all(worker_id, date)
     .map(r => r.time);
 
