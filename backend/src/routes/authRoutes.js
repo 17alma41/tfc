@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const db = require('../config/db');
 const router = express.Router();
 const jwt = require('jsonwebtoken');  
@@ -7,10 +8,17 @@ const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
 const passport = require('passport')
 //const { roleToPath } = require('../config/roleMap');;
 
-router.post('/register', register);
-router.get('/verify-email', verifyEmail);
-router.post('/login', login);
+// Limita el número de peticiones por IP
+const limiter = rateLimit({
+  windowMs: 10*60*1000, // 10min
+  max: 5,
+  message: { status:'error', message:'Demasiados intentos' }
+});
+
+router.post('/register', limiter, register);
+router.post('/login', limiter, login);
 router.post('/logout', logout);
+router.get('/verify-email', verifyEmail);
 router.get('/profile', verifyToken ,getProfile);
 
 router.get('/admin-data', verifyToken, requireRole('admin'), (req, res) => {
@@ -43,7 +51,7 @@ router.get('/users/workers', verifyToken, requireRole(['admin']), (req, res) => 
   }
 });
 
-router.post('/forgot-password', forgotPassword);
+router.post('/forgot-password', limiter, forgotPassword);
 router.post('/reset-password', resetPassword);
 
 // Inicia flujo OAuth

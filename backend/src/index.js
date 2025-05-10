@@ -9,6 +9,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
+const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/authRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
@@ -22,6 +23,15 @@ const app = express();
 // Seguridad y optimización
 app.use(helmet());              
 app.use(compression());         
+
+// Limita el número de peticiones por IP
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Limita a 100 peticiones por IP
+  message: 'Demasiadas peticiones, intenta de nuevo más tarde.'
+});
+
+app.use(limiter);
 
 // CORS restringido y con credenciales
 app.use(cors({
