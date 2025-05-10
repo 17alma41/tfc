@@ -10,7 +10,7 @@ export default function Register() {
     try {
       // Forzamos role = 'cliente'
       await register({ ...values, role: 'cliente' });
-      setStatus({ success: 'Usuario registrado correctamente' });
+      setStatus({ success: 'Revisa tu email para activar tu cuenta.' });
     } catch (err) {
       const message = err.response?.data?.error || err.message || 'Error al registrar';
       setStatus({ error: message });

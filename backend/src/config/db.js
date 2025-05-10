@@ -1,6 +1,18 @@
 const Database = require('better-sqlite3');
 const db = new Database('./database.sqlite');
 
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS pending_users (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT    NOT NULL,
+    email       TEXT    UNIQUE NOT NULL,
+    password    TEXT    NOT NULL,
+    role        TEXT    CHECK(role IN ('superadmin','admin','encargado','trabajador','cliente')) DEFAULT 'cliente',
+    token       TEXT    NOT NULL,
+    created_at  TEXT    DEFAULT CURRENT_TIMESTAMP
+  )
+`).run();
+
 // Crear tabla usuarios si no exista
 db.prepare(`
   CREATE TABLE IF NOT EXISTS users (

@@ -2,12 +2,13 @@ const express = require('express');
 const db = require('../config/db');
 const router = express.Router();
 const jwt = require('jsonwebtoken');  
-const { forgotPassword, resetPassword, register, login, logout, getProfile } = require('../controllers/authController');
+const { forgotPassword, resetPassword, register, login, logout, getProfile, verifyEmail } = require('../controllers/authController');
 const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
 const passport = require('passport')
-const { roleToPath } = require('../config/roleMap');;
+//const { roleToPath } = require('../config/roleMap');;
 
 router.post('/register', register);
+router.get('/verify-email', verifyEmail);
 router.post('/login', login);
 router.post('/logout', logout);
 router.get('/profile', verifyToken ,getProfile);
