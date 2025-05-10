@@ -37,7 +37,7 @@ function App() {
         {/* Página no autorizada */}  
         <Route path="/unauthorized" element={<Unauthorized />} />
 
-
+        {/* Página de reserva */}
         <Route path="/reservar" element={
           <ProtectedRoute role="cliente">
             <BookingPage />

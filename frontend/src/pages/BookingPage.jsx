@@ -20,10 +20,14 @@ const BookingPage = () => {
   const [slots, setSlots] = useState([]);
   const [selectedTime, setSelectedTime] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [message, setMessage] = useState('');
   const [clientReservations, setClientReservations] = useState([]);
 
   const minDate = dayjs().format('YYYY-MM-DD');
+
+  // Regex genérico para validar teléfono (+ opcional y 9-15 dígitos)
+  const phoneRegex = /^\+?\d{9,15}$/;
 
   useEffect(() => {
     getPublicWorkers()
@@ -58,7 +62,26 @@ const BookingPage = () => {
     }
   }, [user]);
 
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    setPhone(value);
+    if (!phoneRegex.test(value)) {
+      setPhoneError('Introduce un teléfono válido (9-15 dígitos, opcional +).');
+    } else {
+      setPhoneError('');
+    }
+  };
+
   const handleReservation = async () => {
+    // Validación adicional antes de enviar
+    if (!phone) {
+      setMessage('El teléfono es obligatorio.');
+      return;
+    }
+    if (phoneError) {
+      setMessage(phoneError);
+      return;
+    }
     try {
       await createReservation({
         user_name:  user.name,
@@ -71,7 +94,7 @@ const BookingPage = () => {
       });
       setMessage('Reserva confirmada 🎉');
 
-      // resfrescar “mis reservas”
+      // refrescar “mis reservas”
       if (user?.role === 'cliente') {
         const res = await getClientReservations();
         setClientReservations(res.data);
@@ -81,6 +104,8 @@ const BookingPage = () => {
       setMessage(err.response?.data?.error || 'Error al crear reserva');
     }
   };
+
+  const now = dayjs();
 
   return (
     <div>
@@ -149,7 +174,7 @@ const BookingPage = () => {
         )
       )}
 
-      <hr/>
+      <hr />
 
       <h3>Tus datos</h3>
       <input type="text" value={user?.name || ''} readOnly style={{ marginRight: '0.5rem' }} />
@@ -158,10 +183,11 @@ const BookingPage = () => {
         type="tel"
         placeholder="Tu teléfono"
         value={phone}
-        onChange={e => setPhone(e.target.value)}
+        onChange={handlePhoneChange}
         style={{ marginRight: '0.5rem' }}
       />
-      <button onClick={handleReservation} disabled={!selectedTime || !phone}>
+      {phoneError && <div style={{ color: 'red', marginBottom: '0.5rem' }}>{phoneError}</div>}
+      <button onClick={handleReservation} disabled={!selectedTime || !phone || !!phoneError}>
         Reservar
       </button>
     </div>
