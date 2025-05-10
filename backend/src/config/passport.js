@@ -1,3 +1,4 @@
+require('dotenv').config();
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const db = require('../config/db');
@@ -15,7 +16,6 @@ passport.use(new GoogleStrategy({
     callbackURL:  process.env.GOOGLE_CALLBACK_URL
   },
   (accessToken, refreshToken, profile, done) => {
-    // profile contiene profile.id, profile.emails[0].value, profile.displayName, etc.
     const email = profile.emails[0].value;
     let user = db
       .prepare(`SELECT * FROM users WHERE google_id = ? OR email = ?`)

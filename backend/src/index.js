@@ -1,6 +1,10 @@
 const express = require('express');
 require('dotenv').config({ path: __dirname + '/../.env' });
 require('./config/passport');
+require('./config/db');
+
+const helmet = require('helmet');
+const compression = require('compression');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -12,31 +16,41 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
 const unavailableDaysRoutes = require('./routes/unavailableDaysRoutes');
 const usersRoutes = require('./routes/usersRoutes');
-require('./config/db'); // crea tabla
 
 const app = express();
 
+// Seguridad y optimización
+app.use(helmet());              
+app.use(compression());         
+
+// CORS restringido y con credenciales
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
 
+// Parsers
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(
-  session({
-    secret: process.env.JWT_SECRET, 
-    resave: false, 
-    saveUninitialized: false, 
-    cookie: { secure: process.env.NODE_ENV === 'production' } // Cookies seguras solo en producción
-  })
-);
+// Sesión segura
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60  // 1 hora
+  }
+}));
 
-// Inicializa Passport para manejar OAuth
+// Passport: inicializa y gestiona sesión
 app.use(passport.initialize());
+app.use(passport.session());
 
-
+// Rutas de la API
 app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/reservations', reservationRoutes);
@@ -44,12 +58,25 @@ app.use('/api/availability', availabilityRoutes);
 app.use('/api/unavailable-days', unavailableDaysRoutes);
 app.use('/api/users', usersRoutes);
 
-// Ruta opcional para test
+// Ruta raíz de test
 app.get('/', (req, res) => {
   res.send('API funcionando ✅');
 });
 
-console.log('SECRET JWT:', process.env.JWT_SECRET);
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ status: 'error', message: 'Not Found' });
+});
 
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack || err);  
+  res.status(err.status || 500)
+     .json({ status: 'error', message: 'Server Error' });
+});
+
+// Arranque
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Backend corriendo en http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Backend corriendo en http://localhost:${PORT}`);
+});
