@@ -37,7 +37,14 @@
 
 **Email**: alvaro@gmail.com
 
-**Password**: 123
+**Password**: alvaro
+
+
+#### Trabajador:
+
+**Email**: worker@gmail.com
+
+**Password**: worker
 
 #### Admin:
 
