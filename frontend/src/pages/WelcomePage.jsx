@@ -16,8 +16,8 @@ export default function WelcomePage() {
           {/* Si NO está autenticado, se muestra Login y Register */}
           {!isAuthenticated && (
             <>
-              <Link to="login">Login</Link>
-              <Link to="register">Register</Link>
+              <Link to="login">Iniciar sesión</Link>
+              <Link to="register">Registrarse</Link>
             </>
           )}
 
