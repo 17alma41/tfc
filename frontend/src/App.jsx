@@ -26,7 +26,6 @@ import ClientReservations from './components/ClientReservations';
 function App() {
   return (
       <Routes>
-
         {/* Autenticación */}
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
