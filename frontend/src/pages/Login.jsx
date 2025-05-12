@@ -1,65 +1,106 @@
+import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom'; 
-import { loginSchema } from '../validationSchemas';
+import { Link } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
+import styles from './Login.module.css';
+import { loginSchema } from '../validationSchemas';
 
 export default function Login() {
   const { loginUser } = useAuth();
-  const initialValues = { email:'', password:'' };
+  const initialValues = { email: '', password: '' };
 
   return (
     <div>
-      <h2>Login</h2>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={loginSchema}
-        onSubmit={(values, formikHelpers) =>
-          loginUser(values, formikHelpers)
-        }
-      >
-        {({ isSubmitting, status }) => (
-          <Form>
-            <div>
-              <label htmlFor="email">Email</label>
-              <Field name="email" type="email" className="form-control"/>
-              <ErrorMessage name="email" component="div" className="text-red-600 text-sm"/>
-            </div>
+      {/* Navbar */}
+      <header className={styles.header}>
+        <Link to="/" className={styles.logo}>
+          Hair Salon
+        </Link>
+      </header>
 
-            <div>
-              <label htmlFor="password">Contraseña</label>
-              <Field name="password" type="password" className="form-control"/>
-              <ErrorMessage name="password" component="div" className="text-red-600 text-sm"/>
-            </div>
+      {/* Contenedor centrado */}
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h2 className={styles.title}>Iniciar sesión</h2>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={loginSchema}
+            onSubmit={(values, formikHelpers) =>
+              loginUser(values, formikHelpers)
+            }
+          >
+            {({ isSubmitting, status }) => (
+              <Form className={styles.form}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="email" className={styles.label}>
+                    Email
+                  </label>
+                  <Field
+                    name="email"
+                    type="email"
+                    className={styles.input}
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className={styles.errorMessage}
+                  />
+                </div>
 
-            {status?.error && <div className="text-red-600">{status.error}</div>}
+                <div className={styles.formGroup}>
+                  <label htmlFor="password" className={styles.label}>
+                    Contraseña
+                  </label>
+                  <Field
+                    name="password"
+                    type="password"
+                    className={styles.input}
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className={styles.errorMessage}
+                  />
+                </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn btn-primary"
-            >
-              {isSubmitting ? 'Entrando…' : 'Entrar'}
-            </button>
+                {status?.error && (
+                  <div className={styles.errorMessage}>
+                    {status.error}
+                  </div>
+                )}
 
-            <div style={{ marginTop: '1rem' }}>
-              <Link to="/forgot-password" className="text-blue-600 hover:underline">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={styles.submitButton}
+                >
+                  {isSubmitting ? 'Entrando…' : 'Entrar'}
+                </button>
 
-            <div style={{ marginTop: '1rem' }}>
-              <a
-                href="http://localhost:3000/api/auth/google"
-                className="btn btn-outline-secondary flex items-center"
-              >
-                <FcGoogle className="mr-2"/> Entrar con Google
-              </a>
-            </div>
+                <Link
+                  to="/forgot-password"
+                  className={styles.forgotLink}
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
 
-          </Form>
-        )}
-      </Formik>
+                <a
+                  href="http://localhost:3000/api/auth/google"
+                  className={styles.googleButton}
+                >
+                  <FcGoogle className={styles.googleIcon} />
+                  Entrar con Google
+                </a>
+              </Form>
+            )}
+          </Formik>
+
+          <Link to="/register" className={styles.registerLink}>
+            Crear una cuenta
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

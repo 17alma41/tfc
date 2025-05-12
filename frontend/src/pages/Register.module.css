@@ -1,0 +1,147 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background-color: var(--beige);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logo {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  color: var(--black);
+  text-decoration: none;
+}
+
+/* Contenedor centrado bajo el header */
+.container {
+  min-height: calc(100vh - 4rem);
+  padding: 6rem 2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--offwhite);
+}
+
+/* Carta blanca */
+.card {
+  margin-top: 2rem;
+  background: var(--white);
+  padding: 3rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Título */
+.title {
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--black);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--dark);
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 0;
+  border: none;
+  border-bottom: 1px solid var(--dark);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  transition: border-color 0.3s;
+}
+
+.input:focus {
+  outline: none;
+  border-bottom: 2px solid var(--accent);
+}
+
+.errorMessage {
+  margin-top: 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--accent);
+}
+
+.successMessage {
+  margin-top: 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: #28a745;
+}
+
+.submitButton {
+  margin: 1rem auto 0;
+  padding: 0.75rem 1.5rem;
+  background: var(--dark);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.submitButton:hover {
+  background: var(--orange);
+  transform: translateY(-1px);
+}
+
+/* Botón Google */
+.googleButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem auto 0;
+  padding: 0.75rem 1.5rem;
+  background: var(--dark);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.googleButton:hover {
+  background: var(--orange);
+  color: var(--white);
+}
+
+.googleIcon {
+  margin-right: 0.5rem;
+  font-size: 1.25rem;
+}
+
+/* Móvil muy pequeño */
+@media (max-width: 480px) {
+  .card {
+    padding: 2rem 1rem;
+  }
+}

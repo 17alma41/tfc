@@ -1,7 +1,7 @@
-/* WelcomePage.module.css */
-
 /* Layout general */
 .container {
+  overflow-x: hidden;
+  padding-top: 4rem; /* espacio para el header fijo */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -9,8 +9,10 @@
 
 /* Header (navbar fijo) */
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   background-color: var(--beige);
   padding: 1rem 2rem;
@@ -19,10 +21,41 @@
   align-items: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+/* Logo */
 .logo {
   font-family: var(--font-title);
   font-size: 1.5rem;
   color: var(--black);
+}
+
+/* Botón hamburguesa */
+.navToggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.navToggle:focus {
+  outline: none;
+}
+.navToggle .bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--black);
+  border-radius: 1px;
+}
+
+/* Navegación */
+.navLinks {
+  display: flex;
+  align-items: center;
 }
 .navLinks a {
   margin-left: 1rem;
@@ -60,28 +93,27 @@
   font-size: clamp(6rem, 20vw, 14rem);
   line-height: 1;
   white-space: nowrap;
-  overflow: visible;
   color: var(--white);
   text-shadow:
     0 2px 4px rgba(0, 0, 0, 0.6),
     0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Intro (centrado vertical y horizontal) */
+/* Intro */
 .intro {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 6rem 1rem;
+  padding: 8rem 2rem; 
   height: 100vh;
   width: 100%;
 }
 .intro p {
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
   max-width: 600px;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto 2rem; 
 }
 .intro button {
   padding: 0.75rem 1.5rem;
@@ -93,27 +125,28 @@
   border-radius: 9999px;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin-top: 1rem;
 }
 .intro button:hover {
   background-color: var(--orange);
 }
 
-/* CTA Reserva (centrado vertical y horizontal) */
+/* CTA Reserva */
 .cta {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 8rem 1rem;
+  padding: 10rem 2rem; 
   height: 100vh;
   width: 100%;
   background-color: var(--offwhite);
 }
 .cta h2 {
   font-family: var(--font-title);
-  font-size: 4.5rem;
-  margin-bottom: 1rem;
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  margin-bottom: 1.5rem; 
 }
 .cta button {
   padding: 0.75rem 1.5rem;
@@ -130,24 +163,24 @@
   background-color: var(--orange);
 }
 
-/* Contacto (centrado vertical y horizontal) */
+/* Contacto */
 .contact {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 6rem 1rem;
+  padding: 8rem 2rem; 
   height: 100vh;
   width: 100%;
 }
-.contact h3 {
+.contactTitle {
   font-family: var(--font-title);
   font-size: 4.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem; 
 }
 .contact p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem; 
 }
 .contact form {
   display: flex;
@@ -158,7 +191,7 @@
 .contact form textarea {
   width: 100%;
   max-width: 500px;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   padding: 0.75rem;
   border: 2px solid var(--gray);
   border-radius: 4px;
@@ -172,21 +205,20 @@
 .contact form button {
   width: auto;
   padding: 0.75rem 1.5rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem; 
 }
-
 .contact form button:hover {
   background-color: var(--orange);
 }
 
-/* Footer (column layout, larger text) */
+/* Footer */
 .footer {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 6rem 1rem;
+  padding: 8rem 2rem; 
   height: 100vh;
   width: 100%;
   background-color: var(--beige);
@@ -195,20 +227,73 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem; 
 }
 .footerNav a {
   font-weight: bold;
   color: var(--black);
   text-decoration: none;
   font-size: 1.8rem;
-  
 }
 .footerNav a:hover {
   color: var(--orange);
 }
 .footerText {
-  margin-top: 5rem;
+  margin-top: 6rem; 
   font-size: 0.8rem;
   color: var(--dark);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .intro, .cta, .contact, .footer {
+    padding: var(--space-xl) var(--space-md); /* Espacio extra en móvil */
+    min-height: 100vh; /* Asegura que cada sección ocupe toda la altura de la pantalla */
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+  }
+  .hero {
+    height: auto;
+  }
+  .hero img {
+    height: auto;
+     min-height: 100vh;
+  }
+  .heroTitle {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: normal;
+    text-align: center;
+    max-width: 80vw;
+  }
+  .contactTitle {
+    font-size: clamp(2rem, 6vw, 4.5rem);
+  }
+  .navToggle {
+    display: flex;
+  }
+  .navLinks {
+    position: fixed;
+    top: 4rem;
+    right: 0;
+    width: 70%;
+    max-width: 300px;
+    height: calc(100% - 4rem);
+    background: var(--beige);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  .navLinks.open {
+    transform: translateX(0);
+  }
+  .navLinks a {
+    margin: 1rem 0;
+  }
 }

@@ -1,4 +1,6 @@
-import React from 'react';
+// WelcomePage.jsx
+
+import React, { useState, useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from './WelcomePage.module.css';
@@ -6,53 +8,81 @@ import heroImg from '../../assets/hero.jpg';
 
 export default function WelcomePage() {
   const { user, isAuthenticated } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Bloquear scroll de body cuando el menú está abierto
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  // Cierra el menú al navegar
+  const handleLinkClick = () => setMenuOpen(false);
+
+  // Cierra menú y hace scroll arriba
+  const handleLogoClick = () => {
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className={styles.container}>
-      {/* Header */}
       <header className={styles.header}>
-        <h1 className={styles.logo}>Hair Salon</h1>
-        <nav className={styles.navLinks}>
-          {/* Si NO está autenticado, se muestra Login y Register */}
+        {/* Logo enlazado al root con scroll-to-top */}
+        <Link to="/" onClick={handleLogoClick}>
+          <h1 className={styles.logo}>Hair Salon</h1>
+        </Link>
+
+        <button
+          className={styles.navToggle}
+          onClick={() => setMenuOpen(open => !open)}
+          aria-label="Toggle menu"
+        >
+          <span className={styles.bar} />
+          <span className={styles.bar} />
+          <span className={styles.bar} />
+        </button>
+
+        <nav className={`${styles.navLinks} ${menuOpen ? styles.open : ''}`}>
           {!isAuthenticated && (
             <>
-              <Link to="login">Iniciar sesión</Link>
-              <Link to="register">Registrarse</Link>
+              <Link to="login" onClick={handleLinkClick}>Iniciar sesión</Link>
+              <Link to="register" onClick={handleLinkClick}>Registrarse</Link>
             </>
           )}
-
-          {/* Si está autenticado y es superadmin */}
           {isAuthenticated && user.role === 'superadmin' && (
-            <Link to="/dashboard/superadmin">Mi panel Super Admin</Link>
+            <Link to="/dashboard/superadmin" onClick={handleLinkClick}>
+              Mi panel Super Admin
+            </Link>
           )}
-
-          {/* Si está autenticado y es admin */}
           {isAuthenticated && user.role === 'admin' && (
-            <Link to="/dashboard/admin">Mi panel Admin</Link>
+            <Link to="/dashboard/admin" onClick={handleLinkClick}>
+              Mi panel Admin
+            </Link>
           )}
-
-          {/* Si está autenticado y es trabajador */}
           {isAuthenticated && user.role === 'trabajador' && (
-            <Link to="/dashboard/worker">Mi panel Trabajador</Link>
+            <Link to="/dashboard/worker" onClick={handleLinkClick}>
+              Mi panel Trabajador
+            </Link>
           )}
-
-          {/* Si está autenticado y es cliente */}
           {isAuthenticated && user.role === 'cliente' && (
             <>
-              <Link to="/dashboard/client">Mi panel</Link>
-              <Link to="reservar">Reservar</Link>
+              <Link to="/dashboard/client" onClick={handleLinkClick}>
+                Mi panel
+              </Link>
+              <Link to="reservar" onClick={handleLinkClick}>
+                Reservar
+              </Link>
             </>
           )}
         </nav>
       </header>
 
-      {/* Hero */}
       <section className={styles.hero}>
         <img src={heroImg} alt="Barber background" />
         <h2 className={styles.heroTitle}>Hair Salon</h2>
       </section>
 
-      {/* Intro */}
       <section className={styles.intro}>
         <p className={styles.introText}>
           Somos un grupo de trabajadoras y trabajadores que damos los mejores
@@ -62,15 +92,13 @@ export default function WelcomePage() {
         <button className={styles.introBtn}>Nuestro trabajo</button>
       </section>
 
-      {/* Reserva CTA */}
       <section className={styles.cta}>
         <h2 className={styles.ctaTitle}>Reserva tu cita</h2>
-        <Link to="/reservar">
+        <Link to="/reservar" onClick={handleLinkClick}>
           <button className={styles.ctaBtn}>Reservar</button>
         </Link>
       </section>
 
-      {/* Contacto */}
       <section className={styles.contact}>
         <h3 className={styles.contactTitle}>Contáctanos</h3>
         <p className={styles.contactText}>
@@ -79,46 +107,31 @@ export default function WelcomePage() {
           <span style={{ color: 'var(--orange)' }}>te ayudaremos</span>.
         </p>
         <form>
-          <input
-            type="text"
-            placeholder="Nombre"
-            required
-            className={styles.contactInput}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            required
-            className={styles.contactInput}
-          />
-          <textarea
-            placeholder="Motivo"
-            rows="3"
-            required
-            className={styles.contactTextarea}
-          />
+          <input type="text" placeholder="Nombre" required className={styles.contactInput} />
+          <input type="email" placeholder="Email" required className={styles.contactInput} />
+          <textarea placeholder="Motivo" rows="3" required className={styles.contactTextarea} />
           <button type="submit" className={styles.contactBtn}>
             Enviar
           </button>
         </form>
       </section>
 
-      {/* Footer */}
       <footer className={styles.footer}>
         <nav className={styles.footerNav}>
-          <Link to="/">Inicio</Link>
-          <Link to="/">Nuestro trabajo</Link>
-          <Link to="/reservar">Reservar</Link>
-          <Link to="/">Contacto</Link>
+          <Link to="/" onClick={handleLinkClick}>Inicio</Link>
+          <Link to="/" onClick={handleLinkClick}>Nuestro trabajo</Link>
+          <Link to="/reservar" onClick={handleLinkClick}>Reservar</Link>
+          <Link to="/" onClick={handleLinkClick}>Contacto</Link>
         </nav>
         <p className={styles.footerText}>
           ©2025 Álvaro TFC &nbsp;|&nbsp;
-          <Link to="/">Terms</Link> &nbsp;|&nbsp;
-          <Link to="/">Privacy</Link> &nbsp;|&nbsp;
-          <Link to="/">Cookies</Link>
+          <Link to="/" onClick={handleLinkClick}>Terms</Link> &nbsp;|&nbsp;
+          <Link to="/" onClick={handleLinkClick}>Privacy</Link> &nbsp;|&nbsp;
+          <Link to="/" onClick={handleLinkClick}>Cookies</Link>
         </p>
       </footer>
+
       <Outlet />
     </div>
-);
+  );
 }
