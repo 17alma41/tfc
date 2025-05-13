@@ -1,25 +1,19 @@
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
-import { useState } from 'react';
+import styles from '../dashboard/AdminDashboard.module.css';
 
-const AdminProfile = () => {
+export default function AdminProfile() {
   const { user, logoutUser } = useAuth();
-  const [message, setMessage] = useState('');
-
-  if (!user) return <p>Cargando perfil del administrador...</p>;
 
   return (
     <div>
-      <h2>Mi Perfil</h2>
-      <p><strong>Nombre:</strong> {user.name}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Rol:</strong> {user.role}</p>
-
-      <button onClick={logoutUser}>Cerrar sesión</button>
-
-      {message && <p>{message}</p>}
+      <h2 className={styles.profileTitle}>Mi Perfil</h2>
+      <p className={styles.profileInfo}><strong>Nombre:</strong> {user.name}</p>
+      <p className={styles.profileInfo}><strong>Email:</strong> {user.email}</p>
+      <p className={styles.profileInfo}><strong>Rol:</strong> {user.role}</p>
+      <button onClick={logoutUser} className={styles.logoutButton}>
+        Cerrar sesión
+      </button>
     </div>
   );
-};
-
-export default AdminProfile;
+}

@@ -1,19 +1,46 @@
+import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { FaUserCircle } from 'react-icons/fa';
+import styles from './ClientDashboard.module.css';
 
-const ClientDashboard = () => {
-  const { logout } = useAuth();
+export default function ClientDashboard() {
+  const { user, logoutUser } = useAuth();
 
   return (
-    <div>
-      <h1>Panel de Cliente</h1>
-      <nav style={{ marginBottom: '1rem' }}>
-        <Link to="profile" style={{ marginRight: '1rem' }}>Mi Perfil</Link>
-        <Link to="reservas" style={{ marginRight: '1rem' }}>Mi Historial</Link>
-      </nav>
-      <Outlet />
-    </div>
-  );
-};
+    <>
+      {/* Header fijo */}
+      <header className={styles.header}>
+        <Link to="/" className={styles.logo}>
+          Hair Salon
+        </Link>
+      </header>
 
-export default ClientDashboard;
+      <div className={styles.container}>
+        {/* Sidebar */}
+        <aside className={styles.sidebar}>
+          <div className={styles.avatar}>
+            <FaUserCircle className={styles.avatarIcon} />
+          </div>
+          <div className={styles.userName}>{user.name}</div>
+          <div className={styles.userEmail}>{user.email}</div>
+
+          <hr className={styles.separator} />
+          <Link to="reservas" className={styles.navItem}>
+            Citas
+          </Link>
+          <hr className={styles.separator} />
+          <button onClick={logoutUser} className={styles.navItem}>
+            Cerrar sesión
+          </button>
+          <hr className={styles.separator} />
+        </aside>
+
+        {/* Área de contenido */}
+        <main className={styles.main}>
+          <Outlet />
+        </main>
+      </div>
+    </>
+  );
+}

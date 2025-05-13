@@ -67,7 +67,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="profile" element={<AdminProfile />} />
           <Route path="services" element={<ServiceManager />} />
           <Route path="trabajadores" element={<UserAdminPanel />} />
         </Route>

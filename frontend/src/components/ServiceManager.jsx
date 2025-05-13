@@ -1,42 +1,36 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   getServices,
   createService,
   updateService,
   deleteService,
 } from '../services/serviceService';
+import styles from '../dashboard/AdminDashboard.module.css';
 
-const ServiceManager = () => {
+export default function ServiceManager() {
   const [services, setServices] = useState([]);
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    price: '',
-    duration: '',
+    title: '', description: '', price: '', duration: '',
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
+  useEffect(() => { fetchServices(); }, []);
 
   const fetchServices = async () => {
     try {
       const res = await getServices();
       setServices(res.data);
-    } catch (err) {
-      console.error('Error al obtener servicios:', err);
+    } catch {
       setMessage('No se pudieron cargar los servicios');
     }
   };
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const handleChange = e =>
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     try {
       if (isEditing) {
@@ -46,101 +40,118 @@ const ServiceManager = () => {
         await createService(formData);
         setMessage('Servicio creado correctamente');
       }
-      resetForm();
+      setFormData({ title:'',description:'',price:'',duration:'' });
+      setIsEditing(false);
       fetchServices();
-    } catch (err) {
-      console.error('Error al guardar servicio:', err);
+    } catch {
       setMessage('Error al guardar el servicio');
     }
   };
 
-  const handleEdit = (service) => {
-    setFormData({
-      title: service.title,
-      description: service.description,
-      price: service.price,
-      duration: service.duration,
-    });
+  const handleEdit = service => {
+    setFormData(service);
     setIsEditing(true);
     setEditingId(service.id);
     setMessage('');
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async id => {
+    if (!window.confirm('¿Seguro que quieres eliminar?')) return;
     try {
       await deleteService(id);
       setMessage('Servicio eliminado correctamente');
       fetchServices();
-    } catch (err) {
-      console.error('Error al eliminar servicio:', err);
+    } catch {
       setMessage('Error al eliminar servicio');
     }
   };
 
-  const resetForm = () => {
-    setFormData({ title: '', description: '', price: '', duration: '' });
-    setIsEditing(false);
-    setEditingId(null);
-  };
-
   return (
     <div>
-      <h2>Gestión de Servicios</h2>
+      <h2 className={styles.managerTitle}>Gestión de Servicios</h2>
+      {message && <p className={styles.managerMessage}>{message}</p>}
 
-      {message && <p style={{ color: 'green' }}>{message}</p>}
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="title"
-          placeholder="Título del servicio"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Descripción del servicio"
-          value={formData.description}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="price"
-          placeholder="Precio (€)"
-          value={formData.price}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="duration"
-          placeholder="Duración (min)"
-          value={formData.duration}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">{isEditing ? 'Actualizar' : 'Crear'} servicio</button>
-        {isEditing && <button type="button" onClick={resetForm}>Cancelar</button>}
+      <form onSubmit={handleSubmit} className={styles.managerForm}>
+        <div className={styles.managerFormGroup}>
+          <input
+            name="title"
+            placeholder="Título"
+            value={formData.title}
+            onChange={handleChange}
+            className={styles.managerInput}
+            required
+          />
+        </div>
+        <div className={styles.managerFormGroup}>
+          <textarea
+            name="description"
+            placeholder="Descripción"
+            value={formData.description}
+            onChange={handleChange}
+            className={styles.managerTextarea}
+            required
+          />
+        </div>
+        <div className={styles.managerFormGroup}>
+          <input
+            name="price"
+            type="number"
+            placeholder="Precio (€)"
+            value={formData.price}
+            onChange={handleChange}
+            className={styles.managerInput}
+            required
+          />
+        </div>
+        <div className={styles.managerFormGroup}>
+          <input
+            name="duration"
+            type="number"
+            placeholder="Duración (min)"
+            value={formData.duration}
+            onChange={handleChange}
+            className={styles.managerInput}
+            required
+          />
+        </div>
+        <button type="submit" className={styles.managerButton}>
+          {isEditing ? 'Actualizar' : 'Crear'} servicio
+        </button>
+        {isEditing && (
+          <button
+            type="button"
+            className={styles.managerCancelButton}
+            onClick={() => setIsEditing(false)}
+          >
+            Cancelar
+          </button>
+        )}
       </form>
 
-      <ul>
-        {services.length > 0 ? (
-          services.map((service) => (
-            <li key={service.id}>
-              <strong>{service.title}</strong> - €{service.price} ({service.duration} min)
-              <p>{service.description}</p>
-              <button onClick={() => handleEdit(service)}>Editar</button>
-              <button onClick={() => handleDelete(service.id)}>Eliminar</button>
-            </li>
-          ))
-        ) : (
-          <p>No hay servicios registrados.</p>
-        )}
+      <ul className={styles.managerList}>
+        {services.map(s => (
+          <li key={s.id} className={styles.managerListItem}>
+            <div className={styles.managerListItemInfo}>
+              <strong>{s.title}</strong> — €{s.price} ({s.duration} min)
+              <p>{s.description}</p>
+            </div>
+            <div className={styles.managerListItemButtons}>
+              <button
+                onClick={() => handleEdit(s)}
+                className={styles.managerButton}
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => handleDelete(s.id)}
+                className={styles.managerCancelButton}
+              >
+                Eliminar
+              </button>
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
-  );
-};
-
-export default ServiceManager;
+);
+}

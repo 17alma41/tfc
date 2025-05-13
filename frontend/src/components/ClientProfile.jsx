@@ -1,32 +1,20 @@
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import styles from '../dashboard/ClientDashboard.module.css'; 
 
-const ClientProfile = () => {
+export default function ClientProfile() {
   const { user, logoutUser } = useAuth();
 
   return (
     <div>
-      <h2>Mi Perfil</h2>
-      <p><strong>Nombre:</strong> {user.name}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Rol:</strong> {user.role}</p>
+      <h2 className={styles.profileTitle}>Mi Perfil</h2>
+      <p className={styles.profileInfo}><strong>Nombre:</strong> {user.name}</p>
+      <p className={styles.profileInfo}><strong>Email:</strong> {user.email}</p>
+      <p className={styles.profileInfo}><strong>Rol:</strong> {user.role}</p>
 
-      {/* Botón de cerrar sesión */}
-      <button
-        onClick={logoutUser}
-        style={{
-          marginTop: '1rem',
-          padding: '0.5rem 1rem',
-          background: '#e53e3e',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer'
-        }}
-      >
+      <button onClick={logoutUser} className={styles.logoutButton}>
         Cerrar sesión
       </button>
     </div>
   );
-};
-
-export default ClientProfile;
+}

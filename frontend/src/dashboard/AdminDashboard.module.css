@@ -1,0 +1,279 @@
+/* Header fijo */
+.header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 4rem;
+  background: var(--beige);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+.logo {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  color: var(--black);
+  text-decoration: none;
+}
+
+/* Layout: sidebar + main */
+.container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+  padding: 6rem 2rem 2rem; /* 4rem header + 2rem separación */
+  background: var(--offwhite);
+  min-height: 100vh;
+}
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--white);
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+.navItem {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--dark);
+  text-decoration: none;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.navItem:hover {
+  color: var(--orange);
+  background: none;
+}
+.separator {
+  border: none;
+  border-top: 1px solid var(--gray);
+  margin: 1rem 0;
+}
+
+/* Avatar y datos de usuario */
+.avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.avatarIcon {
+  font-size: 4rem;
+  color: var(--dark);
+}
+.userName {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  text-align: center;
+  margin-bottom: 0.25rem;
+  color: var(--black);
+}
+.userEmail,
+.userRole {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  text-align: center;
+  margin-bottom: 0.75rem;
+  color: var(--dark);
+}
+
+/* Main */
+.main {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* Perfil */
+.profileTitle {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  color: var(--black);
+  margin-bottom: 1rem;
+}
+.profileInfo {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--dark);
+  margin-bottom: 0.75rem;
+}
+.logoutButton {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: none;
+  color: var(--dark);
+  font-family: var(--font-body);
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.logoutButton:hover {
+  color: var(--orange);
+}
+
+/* Gestión de Servicios */
+.managerTitle {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  color: var(--black);
+  margin-bottom: 1rem;
+}
+.managerMessage {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: #28a745;
+  margin-bottom: 1rem;
+}
+.managerForm {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+.managerFormGroup {
+  margin-bottom: 1rem;
+}
+.managerInput,
+.managerTextarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--gray);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  transition: border-color 0.3s;
+}
+.managerInput:focus,
+.managerTextarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.managerButton,
+.managerCancelButton {
+  padding: 0.5rem 1rem;
+  background: var(--dark);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-right: 0.5rem;
+}
+.managerCancelButton {
+  background: #e53e3e;
+}
+.managerButton:hover {
+  background: var(--orange);
+}
+.managerCancelButton:hover {
+  background: #c53030;
+}
+.managerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.managerListItem {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray);
+}
+.managerListItemInfo {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--dark);
+}
+.managerListItemButtons {
+  margin-top: 0.5rem;
+}
+.managerListItemButtons button {
+  margin-right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.managerListItemButtons .managerButton:hover,
+.managerListItemButtons .managerCancelButton:hover {
+  opacity: 0.9;
+}
+
+/* Gestión de Usuarios */
+.userPanelTitle {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  margin-bottom: 1rem;
+}
+.userPanelSection {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+.userPanelForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.userFormGroup {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+.userInput,
+.userSelect {
+  padding: 0.5rem;
+  border: 1px solid var(--gray);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  transition: border-color 0.3s;
+}
+.userInput:focus,
+.userSelect:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.userPanelButton {
+  padding: 0.5rem 1.5rem;
+  background: var(--dark);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.userPanelButton:hover {
+  background: var(--orange);
+}
+.userTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.userTable th,
+.userTable td {
+  border: 1px solid var(--gray);
+  padding: 0.75rem;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+}
+.userTable th {
+  background: var(--beige);
+}

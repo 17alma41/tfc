@@ -1,20 +1,42 @@
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { FaUserCircle } from 'react-icons/fa';
 import { Link, Outlet } from 'react-router-dom';
+import styles from './AdminDashboard.module.css';
 
-const AdminDashboard = () => {
+export default function AdminDashboard() {
+  const { user, logoutUser } = useAuth();
   return (
-    <div>
-      <h1>Panel de Administrador</h1>
-      <nav style={{ marginBottom: '1rem' }}>
-        {/* Rutas anidadas */}
-        <Link to="profile" style={{ marginRight: '1rem' }}>Mi Perfil</Link>
-        <Link to="services" style={{ marginRight: '1rem' }}>Gestionar Servicios</Link>
-        <Link to="trabajadores">Gestionar trabajadores</Link>
+    <>
+      <header className={styles.header}>
+        <Link to="/" className={styles.logo}>
+          Hair Salon
+        </Link>
+      </header>
 
-      </nav>
+      <div className={styles.container}>
+        <aside className={styles.sidebar}>
+          {/* Cabecera de usuario */}
+          <div className={styles.avatar}>
+            <FaUserCircle className={styles.avatarIcon} />
+          </div>
+          <div className={styles.userName}>{user.name}</div>
+          <div className={styles.userEmail}>{user.email}</div>
+          <div className={styles.userRole}>Rol: {user.role}</div>
+          <hr className={styles.separator} />
 
-      <Outlet />
-    </div>
+          {/* Enlaces de navegación */}
+          <Link to="services" className={styles.navItem}>Gestionar Servicios</Link>
+          <hr className={styles.separator} />
+          <Link to="trabajadores" className={styles.navItem}>Gestionar Trabajadores</Link>
+          <hr className={styles.separator} />
+          <button onClick={logoutUser} className={styles.navItem}>Cerrar sesión</button>
+        </aside>
+
+        <main className={styles.main}>
+          <Outlet />
+        </main>
+      </div>
+    </>
   );
-};
-
-export default AdminDashboard;
+}
