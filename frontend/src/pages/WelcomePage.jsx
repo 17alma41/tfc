@@ -52,17 +52,17 @@ export default function WelcomePage() {
           )}
           {isAuthenticated && user.role === 'superadmin' && (
             <Link to="/dashboard/superadmin" onClick={handleLinkClick}>
-              Mi panel Super Admin
+              Mi panel (SuperAdmin)
             </Link>
           )}
           {isAuthenticated && user.role === 'admin' && (
             <Link to="/dashboard/admin" onClick={handleLinkClick}>
-              Mi panel Admin
+              Mi panel (Admin)
             </Link>
           )}
           {isAuthenticated && user.role === 'trabajador' && (
             <Link to="/dashboard/worker" onClick={handleLinkClick}>
-              Mi panel Trabajador
+              Mi panel (Trabajador)
             </Link>
           )}
           {isAuthenticated && user.role === 'cliente' && (
