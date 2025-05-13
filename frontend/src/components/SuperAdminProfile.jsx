@@ -1,25 +1,25 @@
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
-import { useState } from 'react';
+import styles from '../dashboard/SuperAdminDashboard.module.css';
 
-const SuperAdminProfile = () => {
+export default function SuperAdminProfile() {
   const { user, logoutUser } = useAuth();
-  const [message, setMessage] = useState('');
-
-  if (!user) return <p>Cargando perfil del super administrador...</p>;
 
   return (
     <div>
-      <h2>Mi Perfil</h2>
-      <p><strong>Nombre:</strong> {user.name}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Rol:</strong> {user.role}</p>
-
-      <button onClick={logoutUser}>Cerrar sesión</button>
-
-      {message && <p>{message}</p>}
+      <h2 className={styles.sectionTitle}>Mi Perfil</h2>
+      <p className={styles.profileInfo}>
+        <strong>Nombre:</strong> {user.name}
+      </p>
+      <p className={styles.profileInfo}>
+        <strong>Email:</strong> {user.email}
+      </p>
+      <p className={styles.profileInfo}>
+        <strong>Rol:</strong> {user.role}
+      </p>
+      <button onClick={logoutUser} className={styles.logoutButton}>
+        Cerrar sesión
+      </button>
     </div>
   );
-};
-
-export default SuperAdminProfile;
+}
