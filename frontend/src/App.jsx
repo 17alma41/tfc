@@ -80,7 +80,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="profile" element={<WorkerProfile />} />
           <Route path="reservas" element={<MyReservations />} />
           <Route path="disponibilidad" element={<AvailabilityManager />} />
           <Route path="descansos" element={<UnavailableDaysManager />} />

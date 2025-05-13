@@ -1,19 +1,45 @@
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { FaUserCircle } from 'react-icons/fa';
 import { Link, Outlet } from 'react-router-dom';
+import styles from './WorkerDashboard.module.css';
 
+export default function WorkerDashboard() {
+  const { user, logoutUser } = useAuth();
 
-const WorkerDashboard = () => {
   return (
-    <div>
-      <h1>Panel del trabajador</h1>
-      <nav style={{ marginBottom: '1rem' }}>
-        <Link to="profile" style={{ marginRight: '1rem' }}>Mi Perfil</Link>
-        <Link to="reservas" style={{ marginRight: '1rem' }}>Mis Reservas</Link>
-        <Link to="disponibilidad">Disponibilidad</Link>
-        <Link to="descansos" style={{ marginLeft: '1rem' }}>Días no disponibles</Link>
-      </nav>
-      <Outlet />
-    </div>
-  );
-};
+    <>
+      <header className={styles.header}>
+        <Link to="/" className={styles.logo}>
+          Hair Salon
+        </Link>
+      </header>
 
-export default WorkerDashboard;
+      <div className={styles.container}>
+        <aside className={styles.sidebar}>
+          {/* Cabecera de usuario */}
+          <div className={styles.avatar}>
+            <FaUserCircle className={styles.avatarIcon} />
+          </div>
+          <div className={styles.userName}>{user.name}</div>
+          <div className={styles.userEmail}>{user.email}</div>
+          <div className={styles.userRole}>Rol: {user.role}</div>
+          <hr className={styles.separator} />
+
+          {/* Navegación */}
+          <Link to="reservas" className={styles.navItem}>Mis Reservas</Link>
+          <hr className={styles.separator} />
+          <Link to="disponibilidad" className={styles.navItem}>Disponibilidad</Link>
+          <hr className={styles.separator} />
+          <Link to="descansos" className={styles.navItem}>Días no disponibles</Link>
+          <hr className={styles.separator} />
+          <button onClick={logoutUser} className={styles.navItem}>Cerrar sesión</button>
+        </aside>
+
+        <main className={styles.main}>
+          <Outlet />
+        </main>
+      </div>
+    </>
+  );
+}
