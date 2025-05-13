@@ -277,3 +277,14 @@
 .userTable th {
   background: var(--beige);
 }
+
+/* Separación entre botones en la tabla de usuarios */
+.userTable td button, 
+.userTable td .userPanelButton,
+.userTable td .managerCancelButton {
+  margin-right: 0.75rem; /* espacio horizontal */
+  margin-bottom: 0.5rem; /* espacio vertical en filas muy pequeñas */
+}
+.userTable td button:last-child {
+  margin-right: 0;
+}
