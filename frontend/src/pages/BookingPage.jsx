@@ -331,6 +331,8 @@ export default function BookingPage() {
             <h2 className={styles.modalTitle}>¡Reserva confirmada 🎉!</h2>
             <p style={{ textAlign: 'center', fontFamily: 'var(--font-body)', margin: '1rem 0' }}>
               Hemos registrado tu cita para el {modalDate} a las {selectedTime}.
+              <br />
+              Puedes ver los detalles en tu panel de usuario.
             </p>
             <button
               className={styles.confirmButton}
