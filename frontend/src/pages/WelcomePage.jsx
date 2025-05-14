@@ -94,7 +94,7 @@ export default function WelcomePage() {
 
       <section className={styles.cta}>
         <h2 className={styles.ctaTitle}>Reserva tu cita</h2>
-        <Link to="/reservar" onClick={handleLinkClick}>
+        <Link to="/reservar" onClick={handleLogoClick}>
           <button className={styles.ctaBtn}>Reservar</button>
         </Link>
       </section>
@@ -118,16 +118,16 @@ export default function WelcomePage() {
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav}>
-          <Link to="/" onClick={handleLinkClick}>Inicio</Link>
+          <Link to="/" onClick={handleLogoClick}>Inicio</Link>
           <Link to="/" onClick={handleLinkClick}>Nuestro trabajo</Link>
-          <Link to="/reservar" onClick={handleLinkClick}>Reservar</Link>
+          <Link to="/reservar" onClick={handleLogoClick}>Reservar</Link>
           <Link to="/" onClick={handleLinkClick}>Contacto</Link>
         </nav>
         <p className={styles.footerText}>
           ©2025 Álvaro TFC &nbsp;|&nbsp;
-          <Link to="/" onClick={handleLinkClick}>Terms</Link> &nbsp;|&nbsp;
-          <Link to="/" onClick={handleLinkClick}>Privacy</Link> &nbsp;|&nbsp;
-          <Link to="/" onClick={handleLinkClick}>Cookies</Link>
+          <Link to="/terms" onClick={handleLinkClick}>Terms</Link> &nbsp;|&nbsp;
+          <Link to="/privacy" onClick={handleLinkClick}>Privacy</Link> &nbsp;|&nbsp;
+          <Link to="/cookies" onClick={handleLinkClick}>Cookies</Link>
         </p>
       </footer>
 

@@ -1,4 +1,7 @@
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import CookieBanner from './components/CookieBanner';
+
 import WelcomePage from './pages/WelcomePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -7,45 +10,63 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Unauthorized from './pages/Unauthorized';
 import BookingPage from './pages/BookingPage';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Cookies from './pages/Cookies';
+
 import ProtectedRoute from './components/ProtectedRoute';
+
+import SuperAdminDashboard from './dashboard/SuperAdminDashboard';
 import AdminDashboard from './dashboard/AdminDashboard';
 import WorkerDashboard from './dashboard/WorkerDashboard';
-import ServiceManager from './components/ServiceManager';
-import WorkerProfile from './components/WorkerProfile';
+import ClientDashboard from './dashboard/ClientDashboard';
+
+import SuperAdminProfile from './components/SuperAdminProfile';
 import AdminProfile from './components/AdminProfile';
-import SuperAdminProfile  from  './components/SuperAdminProfile';
+import WorkerProfile from './components/WorkerProfile';
+import ClientProfile from './components/ClientProfile';
+
+import UserAdminPanel from './components/UserAdminPanel';
+import ServiceManager from './components/ServiceManager';
 import MyReservations from './components/MyReservations';
+import ClientReservations from './components/ClientReservations';
 import AvailabilityManager from './components/AvailabilityManager';
 import UnavailableDaysManager from './components/UnavailableDaysManager';
-import UserAdminPanel from './components/UserAdminPanel';
-import SuperAdminDashboard from './dashboard/SuperAdminDashboard';
-import ClientDashboard from './dashboard/ClientDashboard';
-import ClientProfile from './components/ClientProfile'; 
-import ClientReservations from './components/ClientReservations';
 
 function App() {
   return (
+    <>
+      {/* Banner de Cookies: aparece en todas las páginas */}
+      <CookieBanner />
+
       <Routes>
-        {/* Autenticación */}
-        <Route path="/register" element={<Register />} />
+        {/* Rutas Públicas */}
+        <Route path="/" element={<WelcomePage />} />
+        <Route path="/register"   element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login"      element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password"  element={<ResetPassword />} />
-        
-        {/* Página no autorizada */}  
         <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* Página de reserva */}
-        <Route path="/reservar" element={
-          <ProtectedRoute role="cliente">
-            <BookingPage />
-          </ProtectedRoute>
-        }/>
+        {/* Rutas Legales */}
+        <Route path="/terms"   element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/cookies" element={<Cookies />} />
 
-        {/* Dashboard superadmin con rutas anidadas*/}
+        {/* Reserva de cita (solo cliente) */}
         <Route
-          path="/dashboard/superadmin"
+          path="/reservar"
+          element={
+            <ProtectedRoute role="cliente">
+              <BookingPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Dashboard Superadmin */}
+        <Route
+          path="/dashboard/superadmin/*"
           element={
             <ProtectedRoute role="superadmin">
               <SuperAdminDashboard />
@@ -58,49 +79,48 @@ function App() {
           <Route path="availability" element={<AvailabilityManager />} />
         </Route>
 
-        {/* Dashboard administrador con rutas anidadas*/}
+        {/* Dashboard Admin */}
         <Route
-          path="/dashboard/admin"
+          path="/dashboard/admin/*"
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard />
             </ProtectedRoute>
           }
         >
-          <Route path="services" element={<ServiceManager />} />
-          <Route path="trabajadores" element={<UserAdminPanel />} />
+          <Route path="services"      element={<ServiceManager />} />
+          <Route path="trabajadores"  element={<UserAdminPanel />} />
         </Route>
 
-        {/* Dashboard trabajador con rutas anidadas */}
+        {/* Dashboard Worker */}
         <Route
-          path="/dashboard/worker"
+          path="/dashboard/worker/*"
           element={
             <ProtectedRoute role="trabajador">
               <WorkerDashboard />
             </ProtectedRoute>
           }
         >
+          <Route path="perfil" element={<WorkerProfile />} />
           <Route path="reservas" element={<MyReservations />} />
           <Route path="disponibilidad" element={<AvailabilityManager />} />
           <Route path="descansos" element={<UnavailableDaysManager />} />
         </Route>
 
-        {/* Dashboard cliente */}
+        {/* Dashboard Cliente */}
         <Route
-          path="/dashboard/client"
+          path="/dashboard/client/*"
           element={
             <ProtectedRoute role="cliente">
               <ClientDashboard />
             </ProtectedRoute>
           }
-          >
-          <Route path="profile" element={<ClientProfile />} />
+        >
+          <Route path="profile"  element={<ClientProfile />} />
           <Route path="reservas" element={<ClientReservations />} />
-          
         </Route>
 
-
-        {/* Página de servicios */}
+        {/* Página de gestión de servicios general (admin/trabajador) */}
         <Route
           path="/services"
           element={
@@ -109,24 +129,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Página de inicio por defecto */}
-        <Route 
-          path="/" 
-          element={
-            <WelcomePage />
-          } 
-        > 
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="/dashboard/superadmin" element={<SuperAdminDashboard />} />
-          <Route path="/dashboard/admin" element={<AdminDashboard />} />
-          <Route path="/dashboard/worker" element={<WorkerDashboard />} />
-          <Route path="reservar" element={<MyReservations />} />
-
-        </Route>/
-
       </Routes>
+    </>
   );
 }
 
