@@ -89,7 +89,9 @@ export default function WelcomePage() {
           servicios a nuestros clientes para que queden totalmente{' '}
           <span style={{ color: 'var(--orange)' }}>satisfechos</span>.
         </p>
-        <button className={styles.introBtn}>Nuestro trabajo</button>
+        <Link to="/our-work" onClick={handleLinkClick}>
+          <button className={styles.introBtn}>Nuestro trabajo</button>
+        </Link>
       </section>
 
       <section className={styles.cta}>
@@ -119,7 +121,7 @@ export default function WelcomePage() {
       <footer className={styles.footer}>
         <nav className={styles.footerNav}>
           <Link to="/" onClick={handleLogoClick}>Inicio</Link>
-          <Link to="/" onClick={handleLinkClick}>Nuestro trabajo</Link>
+          <Link to="/our-work" onClick={handleLinkClick}>Nuestro trabajo</Link>
           <Link to="/reservar" onClick={handleLogoClick}>Reservar</Link>
           <Link to="/" onClick={handleLinkClick}>Contacto</Link>
         </nav>

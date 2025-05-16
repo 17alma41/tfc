@@ -13,25 +13,26 @@ import BookingPage from './pages/BookingPage';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Cookies from './pages/Cookies';
+import OurWork from './pages/OurWork';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
 import SuperAdminDashboard from './dashboard/SuperAdminDashboard';
-import AdminDashboard from './dashboard/AdminDashboard';
-import WorkerDashboard from './dashboard/WorkerDashboard';
-import ClientDashboard from './dashboard/ClientDashboard';
+import AdminDashboard      from './dashboard/AdminDashboard';
+import WorkerDashboard     from './dashboard/WorkerDashboard';
+import ClientDashboard     from './dashboard/ClientDashboard';
 
-import SuperAdminProfile from './components/SuperAdminProfile';
-import AdminProfile from './components/AdminProfile';
-import WorkerProfile from './components/WorkerProfile';
-import ClientProfile from './components/ClientProfile';
+import SuperAdminProfile   from './components/SuperAdminProfile';
+import AdminProfile        from './components/AdminProfile';
+import WorkerProfile       from './components/WorkerProfile';
+import ClientProfile       from './components/ClientProfile';
 
-import UserAdminPanel from './components/UserAdminPanel';
-import ServiceManager from './components/ServiceManager';
-import MyReservations from './components/MyReservations';
-import ClientReservations from './components/ClientReservations';
-import AvailabilityManager from './components/AvailabilityManager';
-import UnavailableDaysManager from './components/UnavailableDaysManager';
+import UserAdminPanel          from './components/UserAdminPanel';
+import ServiceManager          from './components/ServiceManager';
+import MyReservations          from './components/MyReservations';
+import ClientReservations      from './components/ClientReservations';
+import AvailabilityManager     from './components/AvailabilityManager';
+import UnavailableDaysManager  from './components/UnavailableDaysManager';
 
 function App() {
   return (
@@ -41,13 +42,14 @@ function App() {
 
       <Routes>
         {/* Rutas Públicas */}
-        <Route path="/" element={<WelcomePage />} />
-        <Route path="/register"   element={<Register />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/login"      element={<Login />} />
+        <Route path="/"                element={<WelcomePage />} />
+        <Route path="/register"        element={<Register />} />
+        <Route path="/verify-email"    element={<VerifyEmail />} />
+        <Route path="/login"           element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password"  element={<ResetPassword />} />
-        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/unauthorized"    element={<Unauthorized />} />
+        <Route path="/our-work"        element={<OurWork />} />
 
         {/* Rutas Legales */}
         <Route path="/terms"   element={<Terms />} />
@@ -88,8 +90,8 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="services"      element={<ServiceManager />} />
-          <Route path="trabajadores"  element={<UserAdminPanel />} />
+          <Route path="services"     element={<ServiceManager />} />
+          <Route path="trabajadores" element={<UserAdminPanel />} />
         </Route>
 
         {/* Dashboard Worker */}
@@ -101,10 +103,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="perfil" element={<WorkerProfile />} />
-          <Route path="reservas" element={<MyReservations />} />
+          <Route path="perfil"         element={<WorkerProfile />} />
+          <Route path="reservas"       element={<MyReservations />} />
           <Route path="disponibilidad" element={<AvailabilityManager />} />
-          <Route path="descansos" element={<UnavailableDaysManager />} />
+          <Route path="descansos"      element={<UnavailableDaysManager />} />
         </Route>
 
         {/* Dashboard Cliente */}
@@ -120,7 +122,7 @@ function App() {
           <Route path="reservas" element={<ClientReservations />} />
         </Route>
 
-        {/* Página de gestión de servicios general (admin/trabajador) */}
+        {/* Gestión de servicios (admin/trabajador) */}
         <Route
           path="/services"
           element={
