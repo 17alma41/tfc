@@ -27,11 +27,11 @@ export default function WorkerDashboard() {
           <hr className={styles.separator} />
 
           {/* Navegación */}
-          <Link to="reservas" className={styles.navItem}>Mis Reservas</Link>
+          <Link to="my-reservations" className={styles.navItem}>Mis Reservas</Link>
           <hr className={styles.separator} />
-          <Link to="disponibilidad" className={styles.navItem}>Disponibilidad</Link>
+          <Link to="availability" className={styles.navItem}>Disponibilidad</Link>
           <hr className={styles.separator} />
-          <Link to="descansos" className={styles.navItem}>Días no disponibles</Link>
+          <Link to="unavailable-days" className={styles.navItem}>Días no disponibles</Link>
           <hr className={styles.separator} />
           <button onClick={logoutUser} className={styles.navItem}>Cerrar sesión</button>
         </aside>

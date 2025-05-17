@@ -26,7 +26,7 @@ export default function ClientDashboard() {
           <div className={styles.userEmail}>{user.email}</div>
 
           <hr className={styles.separator} />
-          <Link to="reservas" className={styles.navItem}>
+          <Link to="my-reservations" className={styles.navItem}>
             Citas
           </Link>
           <hr className={styles.separator} />

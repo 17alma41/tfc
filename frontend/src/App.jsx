@@ -58,7 +58,7 @@ function App() {
 
         {/* Reserva de cita (solo cliente) */}
         <Route
-          path="/reservar"
+          path="/reservation"
           element={
             <ProtectedRoute role="cliente">
               <BookingPage />
@@ -91,7 +91,7 @@ function App() {
           }
         >
           <Route path="services"     element={<ServiceManager />} />
-          <Route path="trabajadores" element={<UserAdminPanel />} />
+          <Route path="workers" element={<UserAdminPanel />} />
         </Route>
 
         {/* Dashboard Worker */}
@@ -103,10 +103,9 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="perfil"         element={<WorkerProfile />} />
-          <Route path="reservas"       element={<MyReservations />} />
-          <Route path="disponibilidad" element={<AvailabilityManager />} />
-          <Route path="descansos"      element={<UnavailableDaysManager />} />
+          <Route path="my-reservations"       element={<MyReservations />} />
+          <Route path="availability" element={<AvailabilityManager />} />
+          <Route path="unavailable-days"      element={<UnavailableDaysManager />} />
         </Route>
 
         {/* Dashboard Cliente */}
@@ -118,8 +117,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="profile"  element={<ClientProfile />} />
-          <Route path="reservas" element={<ClientReservations />} />
+          <Route path="my-reservations" element={<ClientReservations />} />
         </Route>
 
         {/* Gestión de servicios (admin/trabajador) */}

@@ -28,7 +28,7 @@ export default function AdminDashboard() {
           {/* Enlaces de navegación */}
           <Link to="services" className={styles.navItem}>Gestionar Servicios</Link>
           <hr className={styles.separator} />
-          <Link to="trabajadores" className={styles.navItem}>Gestionar Trabajadores</Link>
+          <Link to="workers" className={styles.navItem}>Gestionar Trabajadores</Link>
           <hr className={styles.separator} />
           <button onClick={logoutUser} className={styles.navItem}>Cerrar sesión</button>
         </aside>

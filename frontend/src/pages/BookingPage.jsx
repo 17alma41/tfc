@@ -349,7 +349,7 @@ export default function BookingPage() {
         <nav className={styles.footerNav}>
           <Link to="/" onClick={handleRefreshClick}>Inicio</Link>
           <Link to="/">Nuestro trabajo</Link>
-          <Link to="/reservar" onClick={handleRefreshClick}>Reservar</Link>
+          <Link to="/reservation" onClick={handleRefreshClick}>Reservar</Link>
           <Link to="/">Contacto</Link>
         </nav>
         <p className={styles.footerText}>

@@ -70,7 +70,7 @@ export default function WelcomePage() {
               <Link to="/dashboard/client" onClick={handleLinkClick}>
                 Mi panel
               </Link>
-              <Link to="reservar" onClick={handleLinkClick}>
+              <Link to="reservation" onClick={handleLinkClick}>
                 Reservar
               </Link>
             </>
@@ -96,7 +96,7 @@ export default function WelcomePage() {
 
       <section className={styles.cta}>
         <h2 className={styles.ctaTitle}>Reserva tu cita</h2>
-        <Link to="/reservar" onClick={handleLogoClick}>
+        <Link to="/reservation" onClick={handleLogoClick}>
           <button className={styles.ctaBtn}>Reservar</button>
         </Link>
       </section>
@@ -122,7 +122,7 @@ export default function WelcomePage() {
         <nav className={styles.footerNav}>
           <Link to="/" onClick={handleLogoClick}>Inicio</Link>
           <Link to="/our-work" onClick={handleLinkClick}>Nuestro trabajo</Link>
-          <Link to="/reservar" onClick={handleLogoClick}>Reservar</Link>
+          <Link to="/reservation" onClick={handleLogoClick}>Reservar</Link>
           <Link to="/" onClick={handleLinkClick}>Contacto</Link>
         </nav>
         <p className={styles.footerText}>
