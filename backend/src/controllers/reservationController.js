@@ -78,7 +78,7 @@ exports.createReservation = async (req, res) => {
 
     // Opciones de email para el cliente
     const mailToClient = {
-      from: `"Soporte App" <${process.env.EMAIL_USER}>`,
+      from: `"Soporte App" <${process.env.FROM_EMAIL}>`,
       to: user.email,
       subject: 'Confirmación de tu reserva',
       html: `

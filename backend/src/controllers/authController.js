@@ -2,6 +2,7 @@ const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const transporter = require('../config/mailer');
 const { check, validationResult } = require('express-validator');
 
 // Helper para crear JWT de autenticación
@@ -72,22 +73,9 @@ exports.register = async (req, res) => {
 
     // Enviar email de verificación
     const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-    const transporter = nodemailer.createTransport(
-      process.env.NODE_ENV === 'production'
-        ? {
-            service: process.env.EMAIL_SERVICE,
-            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-          }
-        : {
-            host: process.env.EMAIL_HOST,
-            port: +process.env.EMAIL_PORT,
-            secure: false,
-            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-          }
-    );
-
+    
     await transporter.sendMail({
-      from: `"Soporte App" <${process.env.EMAIL_USER}>`,
+      from: `"Soporte App" <${process.env.FROM_EMAIL}>`,
       to: email,
       subject: 'Verifica tu correo electrónico',
       html: `<p>Hola ${name},</p>

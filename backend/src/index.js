@@ -8,6 +8,7 @@ const compression = require('compression');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
 
@@ -49,11 +50,10 @@ app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 1000 * 60 * 60  // 1 hora
-  }
+  store: new MemoryStore({
+    checkPeriod: 86400000 // 24h limpia sesiones expiradas
+  }),
+  cookie: { maxAge: 86400000 }
 }));
 
 // Passport: inicializa y gestiona sesión
