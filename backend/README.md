@@ -113,3 +113,10 @@
     SSL_KEY_PATH=./ssl/key.pem
     SSL_CERT_PATH=./ssl/cert.pem
 
+**6**. ▶️ Ejecución
+```bash
+npm install
+
+npm run start:backend
+```
+
