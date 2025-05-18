@@ -17,11 +17,11 @@
 
 **3**. Autenticación y seguridad
 
-    - Uso de JWT con cookies.
-    - Middleware `verifyToken` (verificar token de cada usuario) y `requireRole` (para comprobar que cada usuario tiene su rol correspondiente al entrar a una ruta en concreto).
-    - Encriptación de datos sensibles.
-    - Validaciones antes de introducir cualquier dato a la base de datos.
-    - Cumplimiento con GDPR.
+- Uso de JWT con cookies.
+- Middleware `verifyToken` (verificar token de cada usuario) y `requireRole` (para comprobar que cada usuario tiene su rol correspondiente al entrar a una ruta en concreto).
+- Encriptación de datos sensibles.
+- Validaciones antes de introducir cualquier dato a la base de datos.
+- Cumplimiento con GDPR.
 
 **4**. Rutas principales (Endpoints)
 
