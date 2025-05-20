@@ -34,9 +34,23 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+// Configuración de CORS
+const allowedOrigins = [
+  'http://localhost',
+  'http://localhost:5173',
+  'http://localhost:8080', // si lo usas
+  process.env.FRONTEND_URL, // por si lo defines en producción
+].filter(Boolean);
+
 // CORS restringido y con credenciales
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
