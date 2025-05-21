@@ -87,7 +87,7 @@
     SUPERADMIN_SECRET=TuSecretoUltraSeguro
 
     # URL del frontend para la verificación de tokens
-    FRONTEND_URL=http://localhost:5173
+    FRONTEND_URL=https://tfcdomain.online
 
     # — Desarrollo (Mailtrap)
     EMAIL_HOST_DEV=smtp.mailtrap.io
@@ -107,7 +107,7 @@
     # Google OAuth
     GOOGLE_CLIENT_ID=TU_CLIENT_ID
     GOOGLE_CLIENT_SECRET=TU_CLIENT_SECRET
-    GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
+    GOOGLE_CALLBACK_URL=https://tfcdomain.online/api/auth/google/callback
 
     # SSL
     SSL_KEY_PATH=./ssl/key.pem

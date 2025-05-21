@@ -1,37 +1,38 @@
-version: '3.8'
-
 services:
   backend:
-      build:
-        context: .
-        dockerfile: ./backend/Dockerfile
-      ports:
-        - "3000:3000"
-      environment:
-        - NDOE_ENV=production
-        - PORT=3000
-        - FRONTEND_URL=http://localhost:5173
-      volumes:
-        - ./database.sqlite:/app/database.sqlite
-      restart: unless-stopped
-      networks:
-        - app-network
-      command: sh -c "npm install && node backend/src/index.js"
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: backend
+    command: sh -c "npm install && node backend/src/index.js"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - FRONTEND_URL=https://tfcdomain.online
+      - GOOGLE_CALLBACK_URL=https://tfcdomain.online/api/auth/google/callback
+    volumes:
+      - ./database.sqlite:/database.sqlite
+      - /tfc/node_modules
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - app-network
 
-  frontend:
-      build:
-        context: ./frontend
-        dockerfile: Dockerfile
-      ports:
-        - "80:80"
-      depends_on:
-        - backend
-      environment:
-        - VITE_API_URL=http://backend:3000
-      restart: unless-stopped
-      networks:
-        - app-network
-  
+  caddy:
+    build:
+      context: .                   # DEBE ser la raíz
+      dockerfile: caddy/Dockerfile
+    container_name: caddy
+    ports:
+      - "8080:80"
+      - "443:443"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

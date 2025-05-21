@@ -1,0 +1,12 @@
+tfcdomain.online {
+  root * /var/www/html
+
+  @api path /api/*
+  reverse_proxy @api backend:3000
+
+  @verify path /verify-email*
+  reverse_proxy @verify backend:3000
+
+  try_files {path} /index.html
+  file_server
+}

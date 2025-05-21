@@ -45,7 +45,7 @@ Los servicios (`/src/services`) encapsulan las peticiones `axios`:
 ```js
 // authService.js
 const api = axios.create({
-  baseURL: 'http://localhost:3000', 
+  baseURL: 'https://tfcdomain.online', 
   withCredentials: true, // permite enviar cookies
 });
 

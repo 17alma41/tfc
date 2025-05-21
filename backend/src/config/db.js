@@ -1,5 +1,8 @@
+const path = require('path');
 const Database = require('better-sqlite3');
-const db = new Database('./database.sqlite');
+
+const dbPath = path.resolve(__dirname, '../../../database.sqlite');
+const db = new Database(dbPath /*, { fileMustExist: false } */);
 
 db.prepare(`
   CREATE TABLE IF NOT EXISTS pending_users (

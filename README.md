@@ -47,7 +47,7 @@ npm install
     SUPERADMIN_SECRET=TuSecretoUltraSeguro
 
     # URL del frontend para la verificación de tokens
-    FRONTEND_URL=http://localhost:5173
+    FRONTEND_URL=https://tfcdomain.online
 
     # — Desarrollo (Mailtrap)
     EMAIL_HOST_DEV=smtp.mailtrap.io
@@ -67,7 +67,7 @@ npm install
     # Google OAuth
     GOOGLE_CLIENT_ID=TU_CLIENT_ID
     GOOGLE_CLIENT_SECRET=TU_CLIENT_SECRET
-    GOOGLE_CALLBACK_URL=http://localhost:3000/api/auth/google/callback
+    GOOGLE_CALLBACK_URL=https://tfcdomain.online/api/auth/google/callback
 
     # SSL
     SSL_KEY_PATH=./ssl/key.pem
@@ -94,8 +94,8 @@ npm install
     
 2. Revisar en nuestro navegador que se hayan abierto las dos pestañas
    
-    - Backend: http://localhost:3000
-    - Frontend: http://localhost:5173
+    - Backend: https://tfcdomain.online
+    - Frontend: https://tfcdomain.online
 
 ### Probar la aplicación como un usuario
 

@@ -86,7 +86,7 @@ export default function Login() {
                 </Link>
 
                 <a
-                  href="http://localhost:3000/api/auth/google"
+                  href="https://tfcdomain.online/api/auth/google"
                   className={styles.googleButton}
                 >
                   <FcGoogle className={styles.googleIcon} />

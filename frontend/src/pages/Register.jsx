@@ -104,7 +104,7 @@ export default function Register() {
 
                 {/* Botón Google */}
                 <a
-                  href="http://localhost:3000/api/auth/google"
+                  href="https://tfcdomain.online/api/auth/google"
                   className={styles.googleButton}
                 >
                   <FcGoogle className={styles.googleIcon} />
