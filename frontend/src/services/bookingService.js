@@ -1,31 +1,17 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',  
-  withCredentials: true,           
+  baseURL: `${import.meta.env.VITE_API_URL}/api/reservations`,
+  withCredentials: true,
 });
 
-
-export const getAvailableSlots = (workerId, date, serviceDuration) => {
-  return api.get('reservations/available-slots', {
-    params: {
-      worker_id: workerId,
-      date,
-      service_duration: serviceDuration
-    }
+export const getAvailableSlots = (workerId, date, serviceDuration) =>
+  api.get('/available-slots', {
+    params: { worker_id: workerId, date, service_duration: serviceDuration },
   });
-};
 
-// Crea la reserva
-export const createReservation = (data) => {
-  return api.post('/reservations', data);
-};
+export const createReservation = (data) => api.post('/', data);
 
-// Cancela la reserva
-export const cancelClientReservation = (id) => {
-  return api.delete(`/reservations/${id}`);
-};
+export const cancelClientReservation = (id) => api.delete(`/${id}`);
 
-// Obtiene las reservas del trabajador logueado
-export const getClientReservations = () =>
-  api.get('/reservations/client');
+export const getClientReservations = () => api.get('/client');

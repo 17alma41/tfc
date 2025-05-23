@@ -1,4 +1,4 @@
-﻿services:
+services:
   backend:
     build: ./backend
     container_name: tfc-backend
@@ -9,8 +9,7 @@
       - ./backend/.env
     networks:
       - tfc-net
-
-  frontend:
+    frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile

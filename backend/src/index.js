@@ -32,7 +32,7 @@ const limiter = rateLimit({
   message: 'Demasiadas peticiones, intenta de nuevo más tarde.'
 });
 
-app.use(limiter);
+// app.use(limiter);
 
 // Configuración de CORS
 const allowedOrigins = [
@@ -102,6 +102,6 @@ app.use((err, req, res, next) => {
 
 // Arranque
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ Backend corriendo en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend listening on port ${PORT}`);
 });

@@ -1,9 +1,8 @@
-FROM node:18
-
-WORKDIR /tfc
-
+FROM node:20
+WORKDIR /app
+COPY package*.json ./
+# Instala solo dependencias de producción
+RUN npm ci --omit=dev
 COPY . .
-
-EXPOSE 3000
-
+ENV NODE_ENV=production
 CMD ["node", "src/index.js"]

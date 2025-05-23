@@ -4,9 +4,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-      '/api': {
-        target: 'https://tfcdomain.online', // Cambia si el backend corre en otro puerto
+    proxy: {      '/api': {
+        target: 'http://backend:3000',
         changeOrigin: true,
         secure: false
       },
