@@ -1,8 +1,8 @@
-﻿services:
+services:  
   backend:
     build: ./backend
     container_name: tfc-backend
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
@@ -13,18 +13,18 @@
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile    
     container_name: tfc-frontend
-    restart: always
+    restart: unless-stopped
     networks:
       - tfc-net
     volumes:
       - frontend-dist:/usr/share/nginx/html
 
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2-alpine    
     container_name: tfc-caddy
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"

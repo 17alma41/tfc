@@ -18,8 +18,12 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
 const unavailableDaysRoutes = require('./routes/unavailableDaysRoutes');
 const usersRoutes = require('./routes/usersRoutes');
+const initializeData = require('./scripts/initializeData');
 
 const app = express();
+
+// Configuración de proxy más completa
+app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal']);
 
 // Seguridad y optimización
 app.use(helmet());              
@@ -29,10 +33,13 @@ app.use(compression());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // Limita a 100 peticiones por IP
-  message: 'Demasiadas peticiones, intenta de nuevo más tarde.'
+  message: 'Demasiadas peticiones, intenta de nuevo más tarde.',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  trustProxy: true
 });
 
-// app.use(limiter);
+app.use(limiter);
 
 // Configuración de CORS
 const allowedOrigins = [
@@ -99,6 +106,9 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500)
      .json({ status: 'error', message: 'Server Error' });
 });
+
+// Inicializar datos predefinidos
+initializeData();
 
 // Arranque
 const PORT = process.env.PORT || 3000;

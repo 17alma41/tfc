@@ -66,29 +66,38 @@ exports.register = async (req, res) => {
 
     // Guardar en pending_users
     db.prepare(
-      `INSERT INTO pending_users
-         (name, email, password, role, token)
+      `INSERT INTO pending_users (name, email, password, role, token)
        VALUES (?, ?, ?, ?, ?)`
     ).run(name, email, hashed, assignedRole, token);
 
-    // Enviar email de verificación
+    // URL de verificación
     const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-    
-    await transporter.sendMail({
+
+    // Configurar y enviar email
+    const mailOptions = {
       from: `"Soporte App" <${process.env.FROM_EMAIL}>`,
       to: email,
       subject: 'Verifica tu correo electrónico',
       html: `<p>Hola ${name},</p>
              <p>Pincha <a href="${verifyUrl}">aquí</a> para activar tu cuenta.</p>
              <p>Este enlace expira en 1 hora.</p>`
-    });
+    };
 
-    return res.status(200).json({ message: 'Te hemos enviado un email de verificación.' });
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("✅ Email de verificación enviado a:", email);
+      return res.status(200).json({ message: 'Te hemos enviado un email de verificación.' });
+    } catch (emailErr) {
+      console.error("❌ Error al enviar email:", emailErr);
+      return res.status(500).json({ error: 'No se pudo enviar el email de verificación.' });
+    }
+
   } catch (err) {
-    console.error('Error al registrar usuario:', err);
+    console.error('❌ Error al registrar usuario:', err);
     return res.status(500).json({ error: 'Error interno al registrar' });
   }
 };
+
 
 /**
  * Verificación de email: mueve de pending_users a users tras confirmar token.
