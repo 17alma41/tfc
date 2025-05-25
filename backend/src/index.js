@@ -107,8 +107,6 @@ app.use((err, req, res, next) => {
      .json({ status: 'error', message: 'Server Error' });
 });
 
-// Inicializar datos predefinidos
-initializeData();
 
 // Arranque
 const PORT = process.env.PORT || 3000;

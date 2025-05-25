@@ -35,17 +35,31 @@ export default function AvailabilityManager() {
     } catch {}
   };
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const capitalizeDay = day => day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
   const handleSubmit = async e => {
     e.preventDefault();
     try {
+      const dayOfWeekIndex = daysOfWeek.findIndex(d => d.toLowerCase() === form.day_of_week.toLowerCase());
+      if (dayOfWeekIndex === -1) throw new Error('Día de la semana inválido');
+
+      const payload = {
+        ...form,
+        day_of_week: capitalizeDay(form.day_of_week), // Normalize day_of_week
+        ...(editingId ? { worker_id: workerId } : {}) // Include worker_id only for PUT
+      };
+      console.log('Payload enviado:', payload); // Log para inspeccionar el payload
+
       if (editingId)
-        await axios.put(`/api/availability/${editingId}`, form, { withCredentials:true });
+        await axios.put(`/api/availability/${editingId}`, payload, { withCredentials: true });
       else
-        await axios.post('/api/availability', { ...form, worker_id:workerId }, { withCredentials:true });
-      setForm({ day_of_week:'monday', start_time:'', end_time:'' });
+        await axios.post('/api/availability', { ...payload, worker_id: undefined }, { withCredentials: true }); // Exclude worker_id for POST
+
+      setForm({ day_of_week: 'monday', start_time: '', end_time: '' });
       setEditingId(null);
       fetchAvailability(workerId);
-    } catch {}
+    } catch (error) {
+      console.error('Error al enviar disponibilidad:', error);
+    }
   };
   const handleEdit = slot => {
     setForm({ day_of_week:slot.day_of_week, start_time:slot.start_time, end_time:slot.end_time });
