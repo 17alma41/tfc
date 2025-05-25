@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    image: 17alma41/tfc-backend:latest
+    container_name: tfc-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - tfc-net
+
+  frontend:
+    image: 17alma41/tfc-frontend:latest
+    container_name: tfc-frontend
+    restart: unless-stopped
+    networks:
+      - tfc-net
+    volumes:
+      - frontend-dist:/usr/share/nginx/html
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: tfc-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+      - frontend-dist:/usr/share/nginx/html
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - tfc-net
+
+volumes:
+  caddy_data:
+  caddy_config:
+  frontend-dist:
+
+networks:
+  tfc-net:
+    driver: bridge
