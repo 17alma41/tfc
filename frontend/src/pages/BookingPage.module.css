@@ -16,6 +16,7 @@
   font-size: 1.5rem;
   color: var(--black);
   text-decoration: none;
+  font-weight: bold; /* Ensure bold font for logo */
 }
 .panelLink {
   font-family: var(--font-body);
@@ -146,10 +147,10 @@
   flex-direction: column;
 }
 .serviceTitle {
-  font-family: var(--font-body);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  margin: 0;
+  font-family: var(--font-body); /* Match the font of the description */
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--dark);
 }
 .serviceDescription {
   font-family: var(--font-body);
