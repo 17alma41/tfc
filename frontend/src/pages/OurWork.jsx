@@ -15,7 +15,9 @@ export default function OurWork() {
     <div className={styles.container}>
       {/* Navbar */}
       <header className={styles.header}>
-        <Link to="/" className={styles.logo}>Hair Salon</Link>
+        <Link to="/" >
+         <h1 className={styles.logo}>Hair Salon</h1>
+        </Link>
       </header>
 
       {/* Título */}

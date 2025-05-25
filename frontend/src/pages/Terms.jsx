@@ -6,7 +6,9 @@ export default function Terms() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <Link to="/" className={styles.logo}>Hair Salon</Link>
+        <Link to="/">
+          <h1 className={styles.logo}>Hair Salon</h1>
+        </Link>
       </header>
 
       <main>

@@ -9,8 +9,8 @@ export default function AdminDashboard() {
   return (
     <>
       <header className={styles.header}>
-        <Link to="/" className={styles.logo}>
-          Hair Salon
+        <Link to="/" >
+          <h1 className={styles.logo}>Hair Salon</h1>
         </Link>
       </header>
 

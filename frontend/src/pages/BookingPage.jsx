@@ -122,7 +122,9 @@ export default function BookingPage() {
     <>
       {/* Header */}
       <header className={styles.header}>
-        <Link to="/" className={styles.logo}>Hair Salon</Link>
+        <Link to="/">
+          <h1 className={styles.logo}>Hair Salon</h1>
+        </Link>
         <Link to="/dashboard/client" className={styles.panelLink}>Mi Panel</Link>
       </header>
 
