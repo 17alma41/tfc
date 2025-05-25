@@ -19,7 +19,6 @@ exports.getByWorker = async (req, res) => {
 
 // Crear slot de disponibilidad
 exports.create = async (req, res) => {
-  console.log('Datos recibidos en el backend:', req.body);
 
   // Tomar el worker_id desde el token si no viene en el body
   const worker_id = req.user.id;
