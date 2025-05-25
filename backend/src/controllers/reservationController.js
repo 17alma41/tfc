@@ -90,7 +90,7 @@ exports.createReservation = async (req, res) => {
 
     // Opciones de email para el trabajador
     const mailToWorker = {
-      from: `"Soporte App" <${process.env.EMAIL_USER}>`,
+      from: `"Soporte App" <${process.env.FROM_EMAIL}>`,
       to: worker.email,
       subject: 'Nueva reserva asignada',
       html: `

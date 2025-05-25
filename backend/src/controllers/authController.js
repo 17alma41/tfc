@@ -19,7 +19,6 @@ const createToken = (user) => {
  * Guarda en pending_users y envía email con enlace de confirmación.
  */
 exports.register = async (req, res) => {
-  // Validaciones de entrada
   await check('name', 'El nombre es obligatorio').notEmpty().run(req);
   await check('email', 'Debe ser un email válido').isEmail().run(req);
   await check('password', 'La contraseña debe tener al menos 6 caracteres')
@@ -39,7 +38,6 @@ exports.register = async (req, res) => {
   const { name, email, password, role } = req.body;
   let assignedRole = 'cliente';
 
-  // Control de creación de superadmin solo en dev
   if (role === 'superadmin') {
     if (process.env.NODE_ENV === 'development') {
       assignedRole = 'superadmin';
@@ -51,45 +49,38 @@ exports.register = async (req, res) => {
   }
 
   try {
-    // Verificar que no exista en users ni en pending_users
     const existsUser = db.prepare('SELECT 1 FROM users WHERE email = ?').get(email);
     const existsPending = db.prepare('SELECT 1 FROM pending_users WHERE email = ?').get(email);
     if (existsUser || existsPending) {
       return res.status(409).json({ error: 'Ya existe una cuenta con ese email' });
     }
 
-    // Generar token de verificación (expira en 1h)
     const token = jwt.sign({ name, email, role: assignedRole }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // Hashear contraseña
     const hashed = bcrypt.hashSync(password, 10);
 
-    // Guardar en pending_users
     db.prepare(
       `INSERT INTO pending_users (name, email, password, role, token)
        VALUES (?, ?, ?, ?, ?)`
     ).run(name, email, hashed, assignedRole, token);
 
-    // URL de verificación
     const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
-    // Configurar y enviar email
-    const mailOptions = {
-      from: `"Soporte App" <${process.env.FROM_EMAIL}>`,
-      to: email,
-      subject: 'Verifica tu correo electrónico',
-      html: `<p>Hola ${name},</p>
-             <p>Pincha <a href="${verifyUrl}">aquí</a> para activar tu cuenta.</p>
-             <p>Este enlace expira en 1 hora.</p>`
-    };
-
     try {
-      await transporter.sendMail(mailOptions);
+      await transporter.sendMail({
+        from: `"Soporte App" <${process.env.FROM_EMAIL}>`,
+        to: email,
+        subject: 'Verifica tu correo electrónico',
+        html: `<p>Hola ${name},</p>
+               <p>Pincha <a href="${verifyUrl}">aquí</a> para activar tu cuenta.</p>
+               <p>Este enlace expira en 1 hora.</p>`
+      });
+
       console.log("✅ Email de verificación enviado a:", email);
       return res.status(200).json({ message: 'Te hemos enviado un email de verificación.' });
+
     } catch (emailErr) {
       console.error("❌ Error al enviar email:", emailErr);
-      return res.status(500).json({ error: 'No se pudo enviar el email de verificación.' });
+      return res.status(500).json({ error: 'Error al enviar el correo de verificación. Intenta más tarde.' });
     }
 
   } catch (err) {
@@ -97,6 +88,7 @@ exports.register = async (req, res) => {
     return res.status(500).json({ error: 'Error interno al registrar' });
   }
 };
+
 
 
 /**
