@@ -1,14 +1,6 @@
 /* FUENTES */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&family=Merriweather+Sans:wght@400;700&display=swap');
 
-@font-face {
-  font-family: 'Canela Bold';
-  src: url('./assets/fonts/Canela-Bold-Trial.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* VARIABLES GLOBALES */
 :root {
   --white:    #FFFFFF;
@@ -19,8 +11,8 @@
   --dark:     #2D2D2D;
   --orange:   #FF7648;
 
-  --font-title: 'Canela Bold', serif;
-  --font-title-alt: 'Playfair Display', serif;
+  --font-title-alt: 'Canela Bold', serif;
+  --font-title: 'Playfair Display', serif;
   --font-body:  'Inter', sans-serif;
 }
 

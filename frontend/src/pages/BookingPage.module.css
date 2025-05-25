@@ -146,7 +146,7 @@
   flex-direction: column;
 }
 .serviceTitle {
-  font-family: var(--font-title);
+  font-family: var(--font-body);
   font-size: var(--font-size-base);
   font-weight: 600;
   margin: 0;
