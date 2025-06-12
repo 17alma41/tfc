@@ -76,7 +76,7 @@ npm install
 
 4. Ejecuta el entorno
    
-    2.1  En la ventana de la terminal
+    4.1  En la ventana de la terminal
 
      ```bash
      # Iniciamos backend y frontend
@@ -105,7 +105,7 @@ npm install
 
 2. Un dominio configurado (ej. tfcdomain.online).
 
-3.**Docker y Docker Compose** instalados en el servidor.
+3. **Docker y Docker Compose** instalados en el servidor.
 
 4. Los archivos del proyecto subidos al servidor (via GitHub).
 
@@ -149,7 +149,8 @@ Este comando:
    - Configura HTTPS automáticamente con Caddy
 
 6. Abrir la web.
-[https://tfcdomain.online]
+
+https://tfcdomain.online
 
 ### Probar la aplicación como un usuario
 
