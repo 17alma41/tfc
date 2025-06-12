@@ -10,7 +10,7 @@ Aplicación web fullstack que permite gestionar reservas de citas para una barbe
 - **Backend**: Node.js, Express, SQLite (con better-sqlite3)
 - **Autenticación**: JWT con cookies
 - **Notificaciones**: Email (con SendGrid)
-- **Deploy**:
+- **Deploy**: Docker, Caddy, Linode (VPS), Namecheap (Dominio)
 
 ### Estructura del proyecto
 ```
@@ -92,10 +92,64 @@ npm install
      npm run start:frontend
     ```
     
+   *Recuerda:* Cambia la ruta asociada a modo local si está apuntando a algún nombre de dominio en concreto.
+    
 2. Revisar en nuestro navegador que se hayan abierto las dos pestañas
    
     - Backend: https://tfcdomain.online
     - Frontend: https://tfcdomain.online
+  
+### Arrancar el proyecto (en producción)
+
+1. Un servidor VPS con Ubuntu (como el de Linode).
+
+2. Un dominio configurado (ej. tfcdomain.online).
+
+3.**Docker y Docker Compose** instalados en el servidor.
+
+4. Los archivos del proyecto subidos al servidor (via GitHub).
+
+5. Variables de entorno configuradas en ``.env``.
+
+#### Ejecutar el proyecto
+
+1. Clonar el repositorio o subir los archivos.
+
+   - Entra en tu servidor:
+```bash
+git clone https://github.com/17alma41/tfc.git
+cd tfc
+```
+
+2. Configurar archivo ``.env``.
+```bash
+nano backend/.env
+```
+
+3. Revisar el archivo `docker-compose.yml`.
+
+   - `backend`
+   - `frontend`
+   - `caddy` (servidor HTTPS)
+
+4. Construir las imágenes.
+```bash
+docker compose build
+```
+
+5. Levantar los contenedires.
+```bash
+docker compose up -d
+```
+
+Este comando:
+
+   - Arranca el backend en producción
+   - Sirve el frontend en el dominio
+   - Configura HTTPS automáticamente con Caddy
+
+6. Abrir la web.
+[https://tfcdomain.online]
 
 ### Probar la aplicación como un usuario
 
@@ -132,5 +186,3 @@ Roles de usuarios:
 - Reserva con notificación por email.
 - Paneles personalizados según el rol.
 - Páginas legales: privacidad, cookies, términos.
-
-### Despliegue
